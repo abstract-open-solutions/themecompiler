@@ -1,0 +1,7 @@
+# this is an example file for dumping templates
+[DEFAULT]
+# default_url= http://localhost:8080/Plone
+
+
+[urls]
+# page.html = %(portale)s/...
