@@ -1,0 +1,29 @@
+# Ignore buildout dirs
+eggs
+bin
+develop-eggs
+parts
+Paste*
+extras
+var
+.mr.developer.cfg
+.installed.cfg
+
+# Ignore python compiled files
+*.py[co]
+# Ignore eggs
+*.egg-info
+# Translation files
+*.mo
+# Ignore backups
+*~
+.*.swp
+# CSSEdit backups
+._*
+# Virtualenv
+lib64
+lib
+include
+# Emacs
+.emacs*
+templates/*
