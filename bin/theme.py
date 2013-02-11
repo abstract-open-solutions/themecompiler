@@ -5,6 +5,7 @@ from base64 import b64encode
 from collections import MutableMapping, namedtuple
 from argparse import ArgumentParser
 from ConfigParser import SafeConfigParser
+from tempfile import mkstemp
 from traceback import print_exc, format_exc
 from SocketServer import ThreadingMixIn
 from wsgiref.simple_server import make_server, WSGIServer
@@ -190,19 +191,19 @@ class LESSFile(object):
         self.compiler = compiler
 
     def __str__(self):
-        return self.path
+        return os.path.basename(self.input_path)
 
     def __repr__(self):
-        return repr(self.path)
+        return repr(self.input_path)
 
     def __unicode__(self):
-        return self.path.decode('utf-8')
+        return os.path.basename(self.input_path).decode('utf-8')
 
     def __hash__(self):
-        return hash(self.path)
+        return hash(self.input_path)
 
     def __eq__(self, other):
-        return self.path == other.path
+        return self.input_path == other.input_path
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -211,14 +212,16 @@ class LESSFile(object):
     def input_path(self):
         return self.compiler.fullpath(
             self.path,
-            base_directory=os.path.dirname(self.referenced_by)
+            base_directory=os.path.dirname(self.referenced_by),
+            match=False
         )
 
     @property
     def output_path(self):
         return self.compiler.fullpath(
             self.css_path,
-            base_directory=os.path.dirname(self.referenced_by)
+            base_directory=os.path.dirname(self.referenced_by),
+            match=False
         )
 
 
@@ -383,12 +386,18 @@ class Dumper(Configurable):
 class HTMLCompiler(Configurable):
     """Compiles HTML templates by processing include directives.
     """
+    # pylint: disable=W0102
 
     include_regex = re.compile(r'^(\s*)@@include "(.+)"')
+    base_regex = re.compile(
+        r'<base\s+href="([A-Za-z0-9\.\\_/\-\+]+)"\s*/>',
+        re.M | re.I | re.S
+    )
     link_regex = re.compile(r'<link(?:(?<!/>).)+/>', re.M | re.I | re.S)
-    href_regex = re.compile(r'href="([A-Za-z0-9\.\\_/-]+\.less)"')
+    href_regex = re.compile(r'href="([A-Za-z0-9\.\\_/\-\+]+\.less)"')
     rel_regex = re.compile(r'rel="([A-Za-z0-9/-]+)"')
-    theme_regex = re.compile(r'^\/?\+\+theme\+\+([^\/]+)\/(.+)$')
+    theme_regex = re.compile(r'\/?\+\+theme\+\+([^\/]+)\/(.+)$')
+    import_regex = re.compile(r'@import\s+"([^"]+)"')
 
     default_config = options(
         option('base_dir', '.',
@@ -409,10 +418,7 @@ class HTMLCompiler(Configurable):
         bool_option('compile_less', False,
                     help_text=("If enabled, the system will compile "
                                "LESS files referenced in templates")),
-        option('nodejs_bin', 'node',
-               help_text=("The name or full path of the node.js binary "
-                          "(needed for offline compiling)")),
-        option('lessc_bin', '../shared/less/less.js/bin/lessc',
+        option('lessc_bin', 'lessc',
                help_text="The path of the LESS compiler file")
     )
 
@@ -430,28 +436,19 @@ class HTMLCompiler(Configurable):
         else:
             self.logger.setLevel(logging.WARNING)
         self.do_compile_less = self.config['compile_less']
-        self.nodejs_bin = self.config['nodejs_bin']
-        if not is_exe(self.nodejs_bin):
-            self.nodejs_bin = which(self.nodejs_bin)
-        if self.nodejs_bin is None:
-            if self.do_compile_less:
-                self.logger.warning(
-                    " ** Could not find node.js executable '%s'" % (
-                        self.config['nodejs_bin'],
-                    )
-                )
         self.lessc_bin = self.config['lessc_bin']
-        if not os.path.exists(self.lessc_bin):
+        if self.lessc_bin is not None and not is_exe(self.lessc_bin):
+            self.lessc_bin = which(self.lessc_bin)
+        if self.lessc_bin is None or not os.path.exists(self.lessc_bin):
             if self.do_compile_less:
                 self.logger.warning(
                     " ** Could not find lessc at '%s'" % self.lessc_bin
                 )
             self.lessc_bin = None
-        if self.do_compile_less and \
-                (self.nodejs_bin is None or self.lessc_bin is None):
+        if self.do_compile_less and self.lessc_bin is None:
             self.logger.warning(
-                " ** Disabling LESS compilation: try setting --nodejs-bin "
-                " and --lessc-bin options"
+                " ** Disabling LESS compilation: try setting "
+                "--lessc-bin options"
             )
             self.do_compile_less = False
 
@@ -487,10 +484,13 @@ class HTMLCompiler(Configurable):
                 else:
                     yield line
 
-    def fullpath(self, path, base_directory=None):
+    def fullpath(self, path, base_directory=None, match=True):
         if base_directory is None:
             base_directory = self.base_directory
-        m = self.theme_regex.match(path)
+        if match:
+            m = self.theme_regex.match(path)
+        else:
+            m = self.theme_regex.search(path)
         if m:
             return join(
                 self.base_directory,
@@ -511,15 +511,24 @@ class HTMLCompiler(Configurable):
         return walk(self.source_folder)
 
     def less2css(self, output_path, less_files=set()):
+        base_ = ''
+        content = ''
+        with open(output_path, 'rb') as output_stream:
+            content = output_stream.read()
+        base_match = self.base_regex.search(content)
+        if base_match is not None:
+            base_ = base_match.group(1)
         def replace(match):
             link = match.group(0)
             href_m = self.href_regex.search(link)
             rel_m = self.rel_regex.search(link)
             if rel_m is not None and href_m is not None and \
                     rel_m.group(1) == "stylesheet/less":
-                href = href_m.group(1)
+                href = base_ + href_m.group(1)
                 base, __ = os.path.splitext(href)
-                less_files.add(LESSFile(href, output_path, base + ".css", self))
+                less_files.add(
+                    LESSFile(href, output_path, base + ".css", self)
+                )
                 transformed_link = "%s%s%s%s" % (
                     link[:href_m.start(1)],
                     base,
@@ -529,9 +538,6 @@ class HTMLCompiler(Configurable):
                 return transformed_link.replace("stylesheet/less",
                                                 "stylesheet")
             return link
-        content = ''
-        with open(output_path, 'rb') as output_stream:
-            content = output_stream.read()
         with open(output_path, 'wb') as output_stream:
             output_stream.write(self.link_regex.sub(replace, content))
 
@@ -547,11 +553,18 @@ class HTMLCompiler(Configurable):
         rel_path = os.path.relpath(compiled, self.templates_folder)
         return join(self.source_folder, rel_path)
 
+    def make_intermediates(self, path):
+        target_dir = os.path.dirname(path)
+        if not os.path.isdir(target_dir):
+            os.makedirs(target_dir)
+
     def compile(self, path, less_files=set()):
         """Try to compile the html file, parsing the @@include tags
         """
-        self.logger.info(" ** Compiling %s" % (path))
+        base_dir = os.getcwd()
+        self.logger.info(" ** Compiling %s" % os.path.relpath(path, base_dir))
         output_path = self.compiled_path(path)
+        self.make_intermediates(output_path)
         with open(output_path, 'wb') as output:
             for line in self.parse(path):
                 output.write(line)
@@ -559,13 +572,63 @@ class HTMLCompiler(Configurable):
             self.less2css(output_path, less_files=less_files)
         return output_path
 
+    def preprocess_less_import(self, matchobj, import_dir, less_files):
+        fullpath = self.fullpath(
+            matchobj.group(1),
+            base_directory=import_dir,
+            match=False
+        )
+        if fullpath.endswith(".less"):
+            fullpath = self.preprocess_less(fullpath, less_files)
+            if os.path.dirname(fullpath) == import_dir:
+                path = os.path.basename(fullpath)
+            else:
+                path = os.path.relpath(fullpath, import_dir)
+        else:
+            path = fullpath
+        return '@import "'+path+'"'
+
+    def preprocess_less(self, less_file, preprocessed_less_files):
+        dir = os.path.dirname(less_file)
+        name, extension = os.path.splitext(os.path.basename(less_file))
+        handle, preprocessed_less_file = mkstemp(
+            prefix=name+"-",
+            suffix="-preprocessed"+extension,
+            dir=dir
+        )
+        os.close(handle)
+        with open(less_file, 'rb') as raw_input:
+            with open(preprocessed_less_file, 'wb') as input:
+                for line in raw_input:
+                    input.write(
+                        self.import_regex.sub(
+                            lambda m: self.preprocess_less_import(
+                                m,
+                                dir,
+                                preprocessed_less_files
+                            ),
+                            line
+                        )
+                    )
+        preprocessed_less_files.add(preprocessed_less_file)
+        return preprocessed_less_file
+
     def compile_less(self, less_files):
+        base_dir = os.getcwd()
         self.logger.info(' * Compiling all LESS files')
         for file in less_files:
             self.logger.info(
-                ' ** Compiling LESS file: %s' % file
+                ' ** Compiling LESS file: %s' % os.path.relpath(
+                    file.input_path,
+                    base_dir
+                )
             )
-            args = (self.nodejs_bin, self.lessc_bin, file.input_path)
+            preprocessed_less = set()
+            input_path = self.preprocess_less(
+                file.input_path,
+                preprocessed_less
+            )
+            args = (self.lessc_bin, input_path)
             try:
                 with open(file.output_path, 'wb') as output_stream:
                     subprocess.check_call(
@@ -577,11 +640,23 @@ class HTMLCompiler(Configurable):
                 if os.path.exists(file.output_path):
                     os.remove(file.output_path)
                 self.logger.error(
-                    " *** Command '%s' failed" % " ".join(args)
+                    " *** Compiling '%s' failed" % os.path.relpath(
+                        file.input_path,
+                        base_dir
+                    )
                 )
                 self.logger.debug(
-                    " **** '%s' reported: %s" % (" ".join(args), e)
+                    " **** Compilation of '%s' reported: %s" % (
+                        os.path.relpath(
+                            file.input_path,
+                            base_dir
+                        ),
+                        e
+                    )
                 )
+            finally:
+                for path in preprocessed_less:
+                    os.remove(path)
 
     def compile_all(self):
         """Compile all html files in the source_folder
@@ -590,6 +665,7 @@ class HTMLCompiler(Configurable):
         self.logger.info(' * Compiling all HTML source templates')
 
         less_files = set()
+        base_dir = os.getcwd()
         for src in self.templates():
             try:
                 self.compile(
@@ -600,7 +676,10 @@ class HTMLCompiler(Configurable):
                 if self.config['block']:
                     raise
                 self.logger.exception(
-                    " ** Error compiling '%s'" % src
+                    " ** Error compiling '%s'" % os.path.relpath(
+                        src,
+                        base_dir
+                    )
                 )
         if self.do_compile_less:
             self.compile_less(less_files)
@@ -643,8 +722,10 @@ h4 { background-color: hsl(200, 5%, 92%); color: hsl(200, 20%, 19%); }
 h5 { background-color: hsl(200, 5%, 94%); color: hsl(200, 20%, 20%); }
 h6 { background-color: hsl(200, 5%, 95%); color: hsl(200, 20%, 21%); }
 .discreet { color: hsl(200, 20%, 30%); font-style: italic; }
-ol { -moz-columns: 3; -webkit-columns: 3; columns: 3;
- list-style-type: lower-greek; }
+ul { -moz-columns: 3; -webkit-columns: 3; columns: 3;
+ list-style-type: none; }
+ul li { -moz-columns: 1; -webkit-columns: 1; columns: 1; }
+li p { margin: 0.1em 0em; }
 a { line-height: 1.5em; padding-left: 0.2em; padding-right: 0.2em;
  color: hsl(0, 70%, 55%); text-decoration: none; }
 a:visited { color: hsl(0, 70%, 55%); }
@@ -657,9 +738,9 @@ body.notfound h1 { color: hsl(40, 90%, 50%); }
 body.error h1 { color: hsl(0, 90%, 50%); }
 @media screen and (max-width: 60em) { #wrapper { width: inherit;
  margin: 0 1em; } }
-@media screen and (max-width: 42em) { ol { -moz-columns: 2;
+@media screen and (max-width: 45em) { ul { -moz-columns: 2;
  -webkit-columns: 2; columns: 2; } }
-@media screen and (max-width: 26em) { ol { -moz-columns: 1;
+@media screen and (max-width: 30em) { ul { -moz-columns: 1;
  -webkit-columns: 1; columns: 1; } }
 """
 
@@ -667,6 +748,8 @@ body.error h1 { color: hsl(0, 90%, 50%); }
     <html>
       <head>
         <title>404 - {path} not found</title>
+        <meta name="viewport"
+              content="initial-scale=1.0, user-scalable=yes, width=device-width, minimum-scale=1.0" />
         <style type="text/css">{style}</style>
       </head>
       <body class="notfound">
@@ -682,6 +765,8 @@ body.error h1 { color: hsl(0, 90%, 50%); }
     <html>
       <head>
         <title>500 - An error has occurred</title>
+        <meta name="viewport"
+              content="initial-scale=1.0, user-scalable=yes, width=device-width, minimum-scale=1.0" />
         <style type="text/css">{style}</style>
       </head>
       <body class="error">
@@ -702,6 +787,8 @@ body.error h1 { color: hsl(0, 90%, 50%); }
     <html>
       <head>
         <title>Templates</title>
+        <meta name="viewport"
+              content="initial-scale=1.0, user-scalable=yes, width=device-width, minimum-scale=1.0" />
         <style type="text/css">{style}</style>
       </head>
       <body class="listing">
@@ -716,9 +803,15 @@ body.error h1 { color: hsl(0, 90%, 50%); }
     </html>
     """
 
-    template_list_template = u'<ol>{items}</ol>'
+    template_list_template = u'<ul>{items}</ul>'
+    template_list_template_with_title = (
+        u'<li>'
+        u'<p>{idx}. <strong>{title}</strong></p>'
+        u'<ul>{items}</ul>'
+        u'</li>'
+    )
     template_list_noitems = u'<p class="discreet">No templates</p>'
-    template_item_template = u'<li><a href="./{1}/{0}">{0}</a></li>'
+    template_item_template = u'<li>{idx}. <a href="./{0}{1}">{2}</a></li>'
     commands = {
         'serve': None,
         'compile': 'Compiler',
@@ -747,7 +840,7 @@ body.error h1 { color: hsl(0, 90%, 50%); }
 
     def get(self, path, start_response):
         try:
-            fullpath = self.compiler.fullpath(path)
+            fullpath = self.compiler.fullpath(path, match=False)
             if self.serve_only or not self.compiler.is_output(fullpath):
                 serve_path = fullpath
             else:
@@ -772,7 +865,7 @@ body.error h1 { color: hsl(0, 90%, 50%); }
                                                      less_files=less_files)
                     self.compiler.compile_less(less_files)
                     ctype = '%s; charset=UTF-8' % (ctype,)
-                    length, info = self.info(fullpath)
+                    length, __ = self.info(fullpath)
                     content = FileWrapper(open(fullpath, 'rb'))
                 status = "200 OK"
         except Exception, e: # pylint: disable=W0703
@@ -795,20 +888,58 @@ body.error h1 { color: hsl(0, 90%, 50%); }
         start_response(status, headers)
         return content
 
-    def template_list(self, compiler_or_dumper):
-        templates = []
-        for template in compiler_or_dumper.templates():
-            templates.append(
-                self.template_item_template.format(
-                    template,
-                    compiler_or_dumper.folder.lstrip(os.sep)
+    def recursive_template_format(self, base_folder, templates, base_url,
+                                  title=None, idx=''):
+        items = []
+        keys = templates.keys()
+        keys.sort()
+        for index, key in enumerate(keys):
+            if isinstance(templates[key], dict):
+                items.append(
+                    self.recursive_template_format(
+                        base_folder,
+                        templates[key],
+                        "/".join([base_url, key]),
+                        title=key,
+                        idx=idx+str(index+1)+'.'
+                    )
                 )
+            else:
+                items.append(
+                    self.template_item_template.format(
+                        base_folder,
+                        "/".join([base_url, key]),
+                        templates[key].replace('_', ' '),
+                        idx=idx+str(index+1)
+                    )
+                )
+        items = "\n".join(items)
+        if title is None:
+            return self.template_list_template.format(items=items)
+        else:
+            return self.template_list_template_with_title.format(
+                title=title.replace('_', ' '),
+                items=items,
+                idx=idx[:-1] if len(idx) > 0 else idx
             )
-        if len(templates) > 0:
-            return self.template_list_template.format(
-                items=u"".join(sorted(templates))
+
+    def template_list(self, compiler_or_dumper):
+        templates = {}
+        for path in compiler_or_dumper.templates():
+            url = path2url(path)
+            url_components = url.split("/")
+            root = templates
+            for component in url_components[:-1]:
+                root = root.setdefault(component, {})
+            root[url_components[-1]] = os.path.splitext(url_components[-1])[0]
+        if len(templates) == 0:
+            return self.template_list_noitems
+        else:
+            return self.recursive_template_format(
+                compiler_or_dumper.folder,
+                templates,
+                '',
             )
-        return self.template_list_noitems
 
     def listing(self, start_response):
         content = self.listing_template.format(
