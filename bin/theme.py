@@ -19,7 +19,8 @@ try:
     CAN_TIDY = True
 except ImportError:
     CAN_TIDY = False
-
+    print 'INFO: html5tidy not found. Skipping HTML tidy-fication.'
+    print 'INFO: use `pip install html5tidy` to install it.'
 
 mimetypes.add_type('text/x-component', '.htc')
 mimetypes.add_type('image/x-icon', '.ico')
