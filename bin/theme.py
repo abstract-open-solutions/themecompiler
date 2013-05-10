@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #FORCE COMMIT
 import os, re, logging, mimetypes, sys, urllib2, subprocess
+import time
 from base64 import b64encode
 from collections import MutableMapping, namedtuple
 from argparse import ArgumentParser
@@ -22,9 +23,36 @@ except ImportError:
     print 'INFO: html5tidy not found. Skipping HTML tidy-fication.'
     print 'INFO: use `pip install html5tidy` to install it.'
 
+
+THEME_PREFIX = '++theme++'
+NO_VALUE = object()
+
 mimetypes.add_type('text/x-component', '.htc')
 mimetypes.add_type('image/x-icon', '.ico')
 mimetypes.add_type('text/css', '.less')
+
+
+# shameless copy from
+# http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
+def is_exe(fpath):
+    return os.path.exists(fpath) and os.access(fpath, os.X_OK)
+
+
+def which(*names):
+    for name in names:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = os.path.join(path, name)
+            if is_exe(exe_file):
+                return exe_file
+    return None
+
+
+def walk(base_folder):
+    for root, __, files in os.walk(base_folder):
+        for file in files:
+            if file.endswith('.html'):
+                fullpath = os.path.join(root, file)
+                yield os.path.relpath(fullpath, base_folder)
 
 
 def url2path(url):
@@ -39,10 +67,12 @@ def urljoin(*args):
     return "/".join(args)
 
 
+def normpath(path):
+    return os.path.normpath(path.replace(THEME_PREFIX, ''))
+
+
 def join(*args):
-    """Join paths
-    """
-    return os.path.normpath(os.path.join(*args))
+    return normpath(os.path.join(*args))
 
 
 class option(object):
@@ -54,6 +84,7 @@ class option(object):
         self.short_name = short_name
         self.default = default
         self.help_text = help_text
+        self.extra_kwargs = {}
 
     @property
     def names(self):
@@ -75,6 +106,7 @@ class option(object):
         }
         if self.help_text:
             kwargs['help'] = self.help_text
+        kwargs.update(self.extra_kwargs)
         parser.add_argument(*self.names, **kwargs)
 
 
@@ -112,6 +144,20 @@ class int_option(option):
         return int(value, 10)
 
 
+class list_option(option):
+    # pylint: disable=W0104
+
+    def __init__(self, name, default, short_name=None, help_text=None):
+        super(list_option, self).__init__(name, default, short_name,
+                                          help_text)
+        self.extra_kwargs['nargs'] = '*'
+
+    def prep(self, value):
+        if isinstance(value, (list, tuple)):
+            return value
+        return value.split(',')
+
+
 class options(MutableMapping):
 
     def __init__(self, *data):
@@ -124,16 +170,22 @@ class options(MutableMapping):
         self.values = {}
 
     def __contains__(self, item):
-        return item in self.options_dict
+        return (item in self.options_dict or item in self.values)
 
     def __iter__(self):
-        return iter(self.options_dict)
+        return iter(set(self.options_dict.keys()) | set(self.values.keys()))
 
     def __len__(self):
-        return len(self.data)
+        return len(set(self.options_dict.keys()) | set(self.values.keys()))
 
     def __getitem__(self, key):
-        return self.values.get(key, self.options_dict[key].default)
+        default = NO_VALUE
+        if key in self.options_dict:
+            default = self.options_dict[key].default
+        if default is NO_VALUE:
+            return self.values[key]
+        else:
+            return self.values.get(key, default)
 
     def __setitem__(self, key, value):
         try:
@@ -153,29 +205,6 @@ class options(MutableMapping):
     def add_to_parser(self, parser):
         for item in self.data:
             item.add_to_parser(parser)
-
-
-# shameless copy from
-# http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
-def is_exe(fpath):
-    return os.path.exists(fpath) and os.access(fpath, os.X_OK)
-
-
-def which(*names):
-    for name in names:
-        for path in os.environ["PATH"].split(os.pathsep):
-            exe_file = os.path.join(path, name)
-            if is_exe(exe_file):
-                return exe_file
-    return None
-
-
-def walk(base_folder):
-    for root, __, files in os.walk(base_folder):
-        for file in files:
-            if file.endswith('.html'):
-                fullpath = os.path.join(root, file)
-                yield os.path.relpath(fullpath, base_folder)
 
 
 class LESSFile(object):
@@ -211,19 +240,11 @@ class LESSFile(object):
 
     @property
     def input_path(self):
-        return self.compiler.fullpath(
-            self.path,
-            base_directory=os.path.dirname(self.referenced_by),
-            match=False
-        )
+        return join(os.path.dirname(self.referenced_by), self.path)
 
     @property
     def output_path(self):
-        return self.compiler.fullpath(
-            self.css_path,
-            base_directory=os.path.dirname(self.referenced_by),
-            match=False
-        )
+        return join(os.path.dirname(self.referenced_by), self.css_path)
 
 
 class ThreadingWSGIServer(ThreadingMixIn, WSGIServer):
@@ -390,14 +411,11 @@ class HTMLCompiler(Configurable):
     # pylint: disable=W0102
 
     include_regex = re.compile(r'^(\s*)@@include "(.+)"')
-    base_regex = re.compile(
-        r'<base\s+href="([A-Za-z0-9\.\\_/\-\+]+)"\s*/>',
-        re.M | re.I | re.S
-    )
     link_regex = re.compile(r'<link(?:(?<!/>).)+/>', re.M | re.I | re.S)
+    # attr_regex = r'="([A-Za-z0-9\.\\_/\-\+]+)"'
+    attr_regex = r'="(?<!http:|/)([A-Za-z0-9\.\\_/\-\+]+)"'
     href_regex = re.compile(r'href="([A-Za-z0-9\.\\_/\-\+]+\.less)"')
     rel_regex = re.compile(r'rel="([A-Za-z0-9/-]+)"')
-    theme_regex = re.compile(r'\/?\+\+theme\+\+([^\/]+)\/(.+)$')
     import_regex = re.compile(r'@import\s+"([^"]+)"')
 
     default_config = options(
@@ -420,7 +438,15 @@ class HTMLCompiler(Configurable):
                     help_text=("If enabled, the system will compile "
                                "LESS files referenced in templates")),
         option('lessc_bin', 'lessc',
-               help_text="The path of the LESS compiler file")
+               help_text="The path of the LESS compiler file"),
+        list_option('url_attrs', ['href', 'src'],
+                    help_text=("List of attributes containing urls "
+                               "(that need rewriting)")),
+        option('optimize_css', '',
+               help_text=("Optimizes the CSS using the given method: "
+                          "'simple' for simple whitespace removal, "
+                          "'yui' for Yahoo UI CSSMin "
+                          "(requires installing the proper NPM)")),
     )
 
     def __init__(self, global_config, **local_config):
@@ -452,12 +478,24 @@ class HTMLCompiler(Configurable):
                 "--lessc-bin options"
             )
             self.do_compile_less = False
+        self.url_regexes = []
+        self.optimize = self.config['optimize_css']
+        for attr in self.config['url_attrs']:
+            self.url_regexes.append(
+                re.compile(re.escape(attr)+self.attr_regex)
+            )
 
     @property
     def folder(self):
         return self.config['compiled_folder']
 
-    def parse(self, path, passed_paths=None): # pylint: disable=W0102
+    def parse(self, path, passed_paths=None, base_path=None,
+              failed_paths=None):
+        # pylint: disable=W0102
+        if failed_paths is None:
+            failed_paths = {}
+        if base_path is None:
+            base_path = os.path.dirname(path)
         if passed_paths is None:
             passed_paths = {}
         with open(path, 'rb') as stream:
@@ -480,26 +518,46 @@ class HTMLCompiler(Configurable):
                         )
                     current_passed_paths[snippet_path] = path
                     for snippet_line in self.parse(snippet_path,
-                                                   current_passed_paths):
+                                                   current_passed_paths,
+                                                   base_path,
+                                                   failed_paths):
                         yield initial_whitespace + snippet_line
                 else:
+                    for url_regex in self.url_regexes:
+                        m = url_regex.search(line)
+                        if m is not None:
+                            fullpath = join(
+                                os.path.dirname(path),
+                                url2path(m.group(1))
+                            )
+                            if not os.path.isfile(fullpath):
+                                failed_paths.setdefault(
+                                    fullpath, set()).add(path)
+                            relpath = path2url(
+                                self.relpath(
+                                    fullpath,
+                                    base_path
+                                )
+                            )
+                            m_start, m_end = m.span(1)
+                            line = line[:m_start]+relpath+line[m_end:]
                     yield line
 
-    def fullpath(self, path, base_directory=None, match=True):
-        if base_directory is None:
-            base_directory = self.base_directory
-        if match:
-            m = self.theme_regex.match(path)
-        else:
-            m = self.theme_regex.search(path)
-        if m:
-            return join(
-                self.base_directory,
-                '..',
-                m.group(1),
-                url2path(m.group(2))
+    def relpath(self, path, base):
+        theme_base = os.path.dirname(self.base_directory.rstrip(os.sep))
+        relative_path = os.path.relpath(path, base)
+        components = relative_path.split(os.sep)
+        current = base
+        for i, component in enumerate(components):
+            if current == theme_base:
+                components[i] = THEME_PREFIX + component
+            current = os.path.normpath(
+                os.path.abspath(os.path.join(current, component))
             )
-        return join(base_directory, url2path(path.rstrip("/")))
+        return os.path.join(*components)
+
+    def fullpath(self, path):
+        return join(self.base_directory, url2path(path.rstrip('/')))
 
     def is_output(self, path):
         if path.startswith(self.templates_folder):
@@ -512,20 +570,16 @@ class HTMLCompiler(Configurable):
         return walk(self.source_folder)
 
     def less2css(self, output_path, less_files=set()):
-        base_ = ''
         content = ''
         with open(output_path, 'rb') as output_stream:
             content = output_stream.read()
-        base_match = self.base_regex.search(content)
-        if base_match is not None:
-            base_ = base_match.group(1)
         def replace(match):
             link = match.group(0)
             href_m = self.href_regex.search(link)
             rel_m = self.rel_regex.search(link)
             if rel_m is not None and href_m is not None and \
                     rel_m.group(1) == "stylesheet/less":
-                href = base_ + href_m.group(1)
+                href = href_m.group(1)
                 base, __ = os.path.splitext(href)
                 less_files.add(
                     LESSFile(href, output_path, base + ".css", self)
@@ -533,7 +587,7 @@ class HTMLCompiler(Configurable):
                 transformed_link = "%s%s%s%s" % (
                     link[:href_m.start(1)],
                     base,
-                    ".css",
+                    ".css?%d" % int(time.time()),
                     link[href_m.end(1):]
                 )
                 return transformed_link.replace("stylesheet/less",
@@ -559,25 +613,26 @@ class HTMLCompiler(Configurable):
         if not os.path.isdir(target_dir):
             os.makedirs(target_dir)
 
-    def compile(self, path, less_files=set()):
+    def compile(self, path, less_files=set(), failed_paths=None):
         """Try to compile the html file, parsing the @@include tags
         """
+        if failed_paths is None:
+            failed_paths = {}
         base_dir = os.getcwd()
         self.logger.info(" ** Compiling %s" % os.path.relpath(path, base_dir))
         output_path = self.compiled_path(path)
         self.make_intermediates(output_path)
         with open(output_path, 'wb') as output:
-            for line in self.parse(path):
+            for line in self.parse(path, failed_paths=failed_paths):
                 output.write(line)
         if self.do_compile_less:
             self.less2css(output_path, less_files=less_files)
         return output_path
 
     def preprocess_less_import(self, matchobj, import_dir, less_files):
-        fullpath = self.fullpath(
-            matchobj.group(1),
-            base_directory=import_dir,
-            match=False
+        fullpath = join(
+            import_dir,
+            url2path(matchobj.group(1))
         )
         if fullpath.endswith(".less"):
             fullpath = self.preprocess_less(fullpath, less_files)
@@ -630,6 +685,10 @@ class HTMLCompiler(Configurable):
                 preprocessed_less
             )
             args = (self.lessc_bin, input_path)
+            if self.optimize == 'simple':
+                args = (args[0], '--compress', args[1])
+            elif self.optimize == 'yui':
+                args = (args[0], '--yui-compress', args[1])
             try:
                 with open(file.output_path, 'wb') as output_stream:
                     subprocess.check_call(
@@ -667,11 +726,13 @@ class HTMLCompiler(Configurable):
 
         less_files = set()
         base_dir = os.getcwd()
+        failed_paths = {}
         for src in self.templates():
             try:
                 self.compile(
                     join(self.source_folder, src),
-                    less_files=less_files
+                    less_files=less_files,
+                    failed_paths=failed_paths
                 )
             except: # pylint: disable=W0702
                 if self.config['block']:
@@ -682,6 +743,18 @@ class HTMLCompiler(Configurable):
                         base_dir
                     )
                 )
+        if len(failed_paths) > 0:
+            self.logger.warning(
+                "Failed paths:\n  * " + "\n  * ".join(
+                    "%s:\n      - %s" % (
+                        os.path.relpath(k, self.base_directory),
+                        "\n      - ".join(
+                            os.path.relpath(p, self.base_directory) for p in v
+                        )
+                    ) \
+                        for k, v in failed_paths.items()
+                )
+            )
         if self.do_compile_less:
             self.compile_less(less_files)
 
@@ -723,9 +796,7 @@ h4 { background-color: hsl(200, 5%, 92%); color: hsl(200, 20%, 19%); }
 h5 { background-color: hsl(200, 5%, 94%); color: hsl(200, 20%, 20%); }
 h6 { background-color: hsl(200, 5%, 95%); color: hsl(200, 20%, 21%); }
 .discreet { color: hsl(200, 20%, 30%); font-style: italic; }
-ul { -moz-columns: 3; -webkit-columns: 3; columns: 3;
- list-style-type: none; }
-ul li { -moz-columns: 1; -webkit-columns: 1; columns: 1; }
+ul { list-style-type: none; }
 li p { margin: 0.1em 0em; }
 a { line-height: 1.5em; padding-left: 0.2em; padding-right: 0.2em;
  color: hsl(0, 70%, 55%); text-decoration: none; }
@@ -739,10 +810,6 @@ body.notfound h1 { color: hsl(40, 90%, 50%); }
 body.error h1 { color: hsl(0, 90%, 50%); }
 @media screen and (max-width: 60em) { #wrapper { width: inherit;
  margin: 0 1em; } }
-@media screen and (max-width: 45em) { ul { -moz-columns: 2;
- -webkit-columns: 2; columns: 2; } }
-@media screen and (max-width: 30em) { ul { -moz-columns: 1;
- -webkit-columns: 1; columns: 1; } }
 """
 
     response_404 = u"""<!DOCTYPE html>
@@ -779,6 +846,23 @@ body.error h1 { color: hsl(0, 90%, 50%); }
           <p>You might want to also copy and paste the data below
              and send it to your system administrator:</p>
           <pre>{traceback}</pre>
+        </div>
+      </body>
+    </html>
+    """
+
+    root_template = u"""<!DOCTYPE html>
+    <html>
+      <head>
+        <title>Themes</title>
+        <meta name="viewport"
+              content="initial-scale=1.0, user-scalable=yes, width=device-width, minimum-scale=1.0" />
+        <style type="text/css">{style}</style>
+      </head>
+      <body class="listing">
+        <div id="wrapper">
+          <h1>Themes</h1>
+          {themes}
         </div>
       </body>
     </html>
@@ -825,8 +909,7 @@ body.error h1 { color: hsl(0, 90%, 50%); }
         super(Application, self).__init__(global_config, **local_config)
         self.config['port'] = self.config['port']
         self.serve_only = self.config['serve_only']
-        self.dumper = self.Dumper(self.config)
-        self.compiler = self.Compiler(self.config)
+        self.base_dir = os.getcwd()
 
     def info(self, path):
         __, extension = os.path.splitext(path)
@@ -839,13 +922,13 @@ body.error h1 { color: hsl(0, 90%, 50%); }
             length = stream.tell()
         return (length, mimetype)
 
-    def get(self, path, start_response):
+    def get(self, compiler, path, start_response):
         try:
-            fullpath = self.compiler.fullpath(path, match=False)
-            if self.serve_only or not self.compiler.is_output(fullpath):
+            fullpath = compiler.fullpath(path)
+            if self.serve_only or not compiler.is_output(fullpath):
                 serve_path = fullpath
             else:
-                serve_path = self.compiler.source_path(fullpath)
+                serve_path = compiler.source_path(fullpath)
             if not os.path.exists(serve_path):
                 status = "404 Not Found"
                 content = [
@@ -862,9 +945,9 @@ body.error h1 { color: hsl(0, 90%, 50%); }
                     content = FileWrapper(open(serve_path, 'rb'))
                 else:
                     less_files = set()
-                    fullpath = self.compiler.compile(serve_path,
+                    fullpath = compiler.compile(serve_path,
                                                      less_files=less_files)
-                    self.compiler.compile_less(less_files)
+                    compiler.compile_less(less_files)
                     ctype = '%s; charset=UTF-8' % (ctype,)
                     length, __ = self.info(fullpath)
                     content = FileWrapper(open(fullpath, 'rb'))
@@ -942,12 +1025,38 @@ body.error h1 { color: hsl(0, 90%, 50%); }
                 '',
             )
 
-    def listing(self, start_response):
+    def listing(self, compiler, dumper, start_response):
         content = self.listing_template.format(
-            compiler=self.compiler,
-            dumper=self.dumper,
-            source_list=self.template_list(self.compiler),
-            dump_list=self.template_list(self.dumper),
+            compiler=compiler,
+            dumper=dumper,
+            source_list=self.template_list(compiler),
+            dump_list=self.template_list(dumper),
+            style=self.style
+        ).encode('utf-8')
+        headers = [
+            ('Content-Type', 'text/html; charset=UTF-8'),
+            ('Content-Length', str(len(content)))
+        ]
+        start_response("200 OK", headers)
+        return [ content ]
+
+    def root(self, start_response):
+        themes = []
+        for path in os.listdir(self.base_dir):
+            fullpath = os.path.join(self.base_dir, path)
+            if os.path.isdir(fullpath):
+                config = self.config.copy()
+                config['base_dir'] = fullpath
+                compiler = self.Compiler(config)
+                if os.path.isdir(compiler.source_folder):
+                    themes.append(
+                        ('./%s%s/' % (THEME_PREFIX, path),
+                         path.replace('_', ' ').capitalize())
+                    )
+        content = self.root_template.format(
+            themes=u'<ul>\n%s\n</ul>\n' % '\n'.join(
+                u'<li><a href="%s">%s</a></li>' % theme for theme in themes
+            ),
             style=self.style
         ).encode('utf-8')
         headers = [
@@ -958,11 +1067,18 @@ body.error h1 { color: hsl(0, 90%, 50%); }
         return [ content ]
 
     def __call__(self, environ, start_response):
-        path = urljoin(*environ['PATH_INFO'].split('/')[1:])
-        if not path:
-            return self.listing(start_response)
+        components = environ['PATH_INFO'].rstrip('/').split('/')[1:]
+        if len(components) == 0:
+            return self.root(start_response)
         else:
-            return self.get(path, start_response)
+            config = self.config.copy()
+            config['base_dir'] = join(self.base_dir, components[0])
+            compiler = self.Compiler(config)
+            dumper = self.Dumper(config)
+            if len(components) > 1:
+                return self.get(compiler, urljoin(*components[1:]),
+                                start_response)
+            return self.listing(compiler, dumper, start_response)
 
     @classmethod
     def main(cls, args):
