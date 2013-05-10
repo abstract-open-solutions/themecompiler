@@ -1,6 +1,7 @@
 #!/usr/bin/python
 #FORCE COMMIT
 import os, re, logging, mimetypes, sys, urllib2, subprocess
+import hashlib
 import time
 from base64 import b64encode
 from collections import MutableMapping, namedtuple
@@ -580,13 +581,24 @@ class HTMLCompiler(Configurable):
                     rel_m.group(1) == "stylesheet/less":
                 href = href_m.group(1)
                 base, __ = os.path.splitext(href)
+                css_path = base + ".css"
+
+                # get md5 hash for cache key
+                md5hash = ''
+                abs_css_path = join(os.path.dirname(output_path), css_path)
+                with open(abs_css_path, 'rb') as css_stream:
+                    css_content = css_stream.read()
+                    m = hashlib.md5()
+                    m.update(css_content)
+                    md5hash = m.hexdigest()
+
                 less_files.add(
-                    LESSFile(href, output_path, base + ".css", self)
+                    LESSFile(href, output_path, css_path, self)
                 )
                 transformed_link = "%s%s%s%s" % (
                     link[:href_m.start(1)],
                     base,
-                    ".css?%d" % int(time.time()),
+                    ".css?%s" % md5hash,
                     link[href_m.end(1):]
                 )
                 return transformed_link.replace("stylesheet/less",
