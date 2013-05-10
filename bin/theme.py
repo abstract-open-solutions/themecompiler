@@ -412,8 +412,7 @@ class HTMLCompiler(Configurable):
 
     include_regex = re.compile(r'^(\s*)@@include "(.+)"')
     link_regex = re.compile(r'<link(?:(?<!/>).)+/>', re.M | re.I | re.S)
-    # attr_regex = r'="([A-Za-z0-9\.\\_/\-\+]+)"'
-    attr_regex = r'="(?<!http:|/)([A-Za-z0-9\.\\_/\-\+]+)"'
+    attr_regex = r'="(\.[A-Za-z0-9\.\\_/\-\+]+)"'
     href_regex = re.compile(r'href="([A-Za-z0-9\.\\_/\-\+]+\.less)"')
     rel_regex = re.compile(r'rel="([A-Za-z0-9/-]+)"')
     import_regex = re.compile(r'@import\s+"([^"]+)"')
