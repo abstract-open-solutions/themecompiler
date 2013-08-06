@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Overlay</title>
+    @@include "../../snippets/head.html"
+  </head>
+  <body>
+    <div class="container" id="visual-portal-wrapper">
+      <div id="content">
+        <!-- start guide -->
+
+
+        <h1>Overlay</h1>
+
+        <div>
+          <h2>Simple overlay</h2>
+          <img src="../../static/img/overlay_demo.jpg"
+            width=150px rel="#pb_1" style="cursor: pointer"
+          />
+          <p>Click on image to enlarge</p>
+        </div>
+
+        <div>
+          <h2>Form overlay</h2>
+            <button rel="#pb_2" class="btn"><span>Open overlay</span></button>
+        </div>
+      </div>
+
+    </div>
+    <div class="overlay overlay-ajax" id="pb_1">
+      <div class="close">
+        <a title="Close this box" class="hiddenStructure" href="#">Close this box.</a>
+      </div>
+      <div class="pb-ajax">
+        <img src="../../static/img/overlay_demo.jpg" rel="#pb_1"/>
+      </div>
+    </div>
+    <div class="overlay overlay-ajax" id="pb_2">
+      <div class="close">
+        <a title="Close this box" class="hiddenStructure" href="#">Close this box.</a>
+      </div>
+      <div class="pb-ajax">
+        <div id="content-core">
+
+          <form action="" id="login_form" method="post" class="enableAutoFocus">
+
+            <div id="login-form">
+              <div class="field">
+                <label for="__ac_name">Nome utente</label>
+                <input type="text" id="__ac_name" value="" name="__ac_name" size="15"></div>
+
+              <div class="field">
+                <label for="__ac_password">Password</label>
+                <input type="password" id="__ac_password" name="__ac_password" size="15"></div>
+
+              <div class="formControls">
+                <input type="submit" value="Accedi" name="submit" class="context"></div>
+            </div>
+          </form>
+
+          <div id="login-forgotten-password"> <strong>Hai dimenticato la tua password?</strong>
+            <p class="discreet">
+              Se hai dimenticato la tua password,
+              <span>
+                <a href="http://127.0.0.1:8082/Plone/mail_password_form?userid=">possiamo spedirtene una nuova</a>
+              </span>
+              .
+            </p>
+          </div>
+
+        </div>
+
+
+      <!-- end guide -->
+      </div>
+    </div>
+    @@include "../../snippets/extra_scripts.html"
+
+    <!-- extra javascript -->
+    <script type="text/javascript">
+      $(function() {
+          $("img[rel]").overlay();
+          $("button[rel]").overlay();
+      });
+    </script>
+
+  </body>
+</html>

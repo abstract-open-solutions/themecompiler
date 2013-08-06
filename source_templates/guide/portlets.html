@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Portlets</title>
+    @@include "../../snippets/head.html"
+  </head>
+  <body>
+    <div class="container" id="visual-portal-wrapper">
+      <div id="content">
+        <!-- start guide -->
+
+        <h1>Portlets</h1>
+
+        <div style="width: 300px">
+          <h2>Navigation portlet</h2>
+          <dl class="portlet portletNavigationTree">
+            <dt class="portletHeader">
+              <span class="portletTopLeft"></span>
+              <a class="tile" href="http://127.0.0.1:8082/Plone/sitemap">Navigazione</a>
+              <span class="portletTopRight"></span>
+            </dt>
+
+            <dd class="portletItem lastItem">
+              <ul class="navTree navTreeLevel0">
+                <li class="navTreeItem visualNoMarker navTreeFolderish section-news">
+                  <a title="Notizie del sito" class="state-published navTreeFolderish contenttype-folder" href="http://127.0.0.1:8082/Plone/news">
+                    <span>Notizie</span>
+                  </a>
+                </li>
+
+                <li class="navTreeItem visualNoMarker navTreeFolderish section-events">
+                  <a title="Eventi del sito" class="state-published navTreeFolderish contenttype-folder" href="http://127.0.0.1:8082/Plone/events">
+                    <span>Eventi</span>
+                  </a>
+                </li>
+
+                <li class="navTreeItem visualNoMarker navTreeFolderish section-members">
+                  <a title="Contenitore delle cartelle personali dei collaboratori." class="state-published navTreeFolderish contenttype-folder" href="http://127.0.0.1:8082/Plone/Members">
+                    <span>Collaboratori</span>
+                  </a>
+                </li>
+
+                <li class="navTreeItem visualNoMarker navTreeCurrentNode navTreeFolderish section-test-first-level">
+                  <a title="Folder first level description" class="state-private navTreeCurrentItem navTreeCurrentNode navTreeFolderish contenttype-folder" href="http://127.0.0.1:8082/Plone/test-first-level">
+                    <span>test first level</span>
+                  </a>
+                  <ul class="navTree navTreeLevel1">
+                    <li class="navTreeItem visualNoMarker navTreeFolderish section-second-level">
+                      <a title="second level folder description" class="state-private navTreeFolderish contenttype-folder" href="http://127.0.0.1:8082/Plone/test-first-level/second-level">
+                        <span>Second level</span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+
+              </ul>
+              <span class="portletBottomLeft"></span>
+              <span class="portletBottomRight"></span>
+            </dd>
+          </dl>
+        </div>
+
+
+      <!-- end guide -->
+      </div>
+    </div>
+    @@include "../../snippets/extra_scripts.html"
+  </body>
+</html>

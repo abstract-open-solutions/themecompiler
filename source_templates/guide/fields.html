@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Form elements</title>
+    @@include "../../snippets/head.html"
+  </head>
+  <body>
+    <div class="container" id="visual-portal-wrapper">
+      <div id="content">
+        <!-- start guide -->
+
+        <h1 class="documentFirstHeading">Form elements</h1>
+
+          <form>
+            <fieldset>
+              <legend>Fieldset legend</legend>
+              <div class="field">
+                <label>Text field</label>
+                <span title="Required" class="required">(Required)</span>
+                <div class="formHelp">
+                  This is the help for this form field. And
+                  <a href="#">links are also possible</a>
+                  .
+                </div>
+                <input type="text" value="Some content" id="onefield">
+              </div>
+
+              <div class="field">
+                <label>Text field without help text</label>
+                <div class="formHelp"></div>
+                <input type="text" value="" id="twofield">
+              </div>
+
+              <div class="field error">
+                <label>Text field with error</label>
+                <span title="Required" class="fieldRequired">(Required)</span>
+                <div class="formHelp">This field is just here to demonstrate an error message.</div>
+                <div>This is the error message.</div>
+                <input type="text" value="Some content" id="anotherfield">
+              </div>
+
+              <div class="field">
+                <label>Checkbox</label>
+                <span title="Required" class="fieldRequired">(Required)</span>
+                <div class="formHelp">This is a checkbox field.</div>
+                <input type="checkbox" id="onecheckbox">
+              </div>
+
+              <div class="field error">
+                <label>Checkbox with error</label>
+                <span title="Required" class="fieldRequired">(Required)</span>
+                <div class="formHelp">
+                  This checkbox field is just here to demonstrate an error message.
+                </div>
+                <div>This is the error message.</div>
+                <input type="checkbox" id="anothercheckbox">
+              </div>
+
+              <div class="field">
+                <label>Checkbox without border</label>
+                <span title="Required" class="fieldRequired">(Required)</span>
+                <div class="formHelp">This is a checkbox field.</div>
+                <input type="checkbox" id="onestylishcheckbox" class="noborder"></div>
+              <div class="field error">
+                <label>Checkbox without border with error</label>
+                <span title="Required" class="fieldRequired">(Required)</span>
+                <div class="formHelp">
+                  This checkbox field is just here to demonstrate an error message.
+                </div>
+                <div>This is the error message.</div>
+                <input type="checkbox">
+              </div>
+
+              <div id="archetypes-fieldname-excludeFromNav"
+          class="field ArchetypesBooleanWidget">
+                <input type="checkbox" id="excludeFromNav"
+          name="excludeFromNav:boolean" value="on" class="noborder" originalvalue="on">
+                <input type="hidden" name="excludeFromNav:boolean:default" value="" originalvalue="">
+                <label for="excludeFromNav" class="formQuestion">
+                  Another checkbox
+                  <span id="excludeFromNav_help"
+                    class="formHelp"
+                    >This is a checkbox field used in Plone</span>
+                </label>
+                <div class="fieldErrorBox"></div>
+                <div></div>
+              </div>
+
+              <div class="field">
+                <label>Radio</label>
+                <span title="Required" class="fieldRequired">(Required)</span>
+                <div class="formHelp">This is a checkbox field.</div>
+                <label>
+                  First
+                  <input type="radio" name="radio_group1" class="noborder"></label>
+                <br>
+                <label>
+                  Second
+                  <input type="radio" name="radio_group1" class="noborder"></label>
+                <br>
+                <label>
+                  Third
+                  <input type="radio" name="radio_group1" class="noborder"></label>
+                <br>
+              </div>
+
+              <div class="field error">
+                <label>Radio with error</label>
+                <span title="Required" class="fieldRequired">(Required)</span>
+                <div class="formHelp">
+                  This checkbox field is just here to demonstrate an error message.
+                </div>
+                <div>This is the error message.</div>
+                <label>
+                  First
+                  <input type="radio" name="radio_group2" class="noborder"></label>
+                <br>
+                <label>
+                  Second
+                  <input type="radio" name="radio_group2" class="noborder"></label>
+                <br>
+                <label>
+                  Third
+                  <input type="radio" name="radio_group2" class="noborder"></label>
+                <br>
+              </div>
+            </fieldset>
+          </form>
+
+        <hr />
+        <h2>Date Time widget</h2>
+        <div id="archetypes-fieldname-expirationDate" data-uid="8a2c83bc13f24730aef82639a48e9411" data-fieldname="expirationDate" class="field ArchetypesCalendarWidget ">
+          <span></span>
+
+          <div class="fieldErrorBox"></div>
+
+          <div class="formQuestion label">
+            Data di scadenza
+            <span id="expirationDate_help" class="formHelp">
+              La data di scadenza del documento. Dopo questa data, il documento sarà reso automaticamente invisibile agli altri visitatori. Se non viene inserita alcuna data il documento rimarrà visibile indefinitamente.
+            </span>
+          </div>
+
+          <div class="plone_jscalendar">
+
+            <input type="hidden" id="edit_form_expirationDate_1" name="expirationDate" originalvalue="">
+            <input type="hidden" id="expirationDate" originalvalue="">
+
+            <label for="edit_form_expirationDate_1_year" style="float:left" class="hiddenStructure">Anno</label>
+            <span>
+              <select size="1" id="edit_form_expirationDate_1_year" name="expirationDate_year">
+                <option selected="selected" value="0000">--</option>
+                <option value="2001">2001</option>
+                <option value="2002">2002</option>
+                <option value="2003">2003</option>
+                <option value="2004">2004</option>
+                <option value="2005">2005</option>
+                <option value="2006">2006</option>
+                <option value="2007">2007</option>
+                <option value="2008">2008</option>
+                <option value="2009">2009</option>
+                <option value="2010">2010</option>
+                <option value="2011">2011</option>
+                <option value="2012">2012</option>
+                <option value="2013">2013</option>
+                <option value="2014">2014</option>
+                <option value="2015">2015</option>
+                <option value="2016">2016</option>
+                <option value="2017">2017</option>
+                <option value="2018">2018</option>
+
+              </select>
+            </span>
+
+            <span>/</span>
+
+            <span>
+              <label for="edit_form_expirationDate_1_month" style="float:left" class="hiddenStructure">Mese</label>
+              <select size="1" id="edit_form_expirationDate_1_month" name="expirationDate_month">
+                <option selected="selected" value="00">--</option>
+                <option value="01">gennaio</option>
+                <option value="02">febbraio</option>
+                <option value="03">marzo</option>
+                <option value="04">aprile</option>
+                <option value="05">maggio</option>
+                <option value="06">giugno</option>
+                <option value="07">luglio</option>
+                <option value="08">agosto</option>
+                <option value="09">settembre</option>
+                <option value="10">ottobre</option>
+                <option value="11">novembre</option>
+                <option value="12">dicembre</option>
+              </select>
+            </span>
+
+            <span>/</span>
+
+            <label for="edit_form_expirationDate_1_day" style="float:left" class="hiddenStructure">Giorno</label>
+            <select size="1" id="edit_form_expirationDate_1_day" name="expirationDate_day">
+
+              <option selected="selected" value="00">--</option>
+              <option value="01">1</option>
+              <option value="02">2</option>
+              <option value="03">3</option>
+              <option value="04">4</option>
+              <option value="05">5</option>
+              <option value="06">6</option>
+              <option value="07">7</option>
+              <option value="08">8</option>
+              <option value="09">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+              <option value="13">13</option>
+              <option value="14">14</option>
+              <option value="15">15</option>
+              <option value="16">16</option>
+              <option value="17">17</option>
+              <option value="18">18</option>
+              <option value="19">19</option>
+              <option value="20">20</option>
+              <option value="21">21</option>
+              <option value="22">22</option>
+              <option value="23">23</option>
+              <option value="24">24</option>
+              <option value="25">25</option>
+              <option value="26">26</option>
+              <option value="27">27</option>
+              <option value="28">28</option>
+              <option value="29">29</option>
+              <option value="30">30</option>
+              <option value="31">31</option>
+
+            </select>
+            <span id="edit_form_expirationDate_1_popup" style="cursor: pointer;" class="plone-jscalendar-popup">
+              <input type="hidden" id="edit_form_expirationDate_1_yearStart" value="0000" name="expirationDate_yearStart" originalvalue="0000">
+              <input type="hidden" id="edit_form_expirationDate_1_yearEnd" value="2018" name="expirationDate_yearEnd" originalvalue="2018">
+              <img width="16" height="16" title="" alt="" src="../../static/img/popup_calendar.png"></span>
+            &nbsp;
+            <span>
+              <label for="edit_form_expirationDate_1_hour" style="float:left" class="hiddenStructure">Ora</label>
+              <select size="1" id="edit_form_expirationDate_1_hour" name="expirationDate_hour">
+
+                <option selected="selected" value="00">--</option>
+                <option value="00">00</option>
+                <option value="01">01</option>
+                <option value="02">02</option>
+                <option value="03">03</option>
+                <option value="04">04</option>
+                <option value="05">05</option>
+                <option value="06">06</option>
+                <option value="07">07</option>
+                <option value="08">08</option>
+                <option value="09">09</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+
+              </select>
+            </span>
+
+            <span>:</span>
+
+            <span>
+              <label for="edit_form_expirationDate_1_minute" style="float:left" class="hiddenStructure">Minuto</label>
+              <select size="1" id="edit_form_expirationDate_1_minute" name="expirationDate_minute">
+
+                <option selected="selected" value="00">--</option>
+                <option value="00">00</option>
+                <option value="05">05</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+                <option value="25">25</option>
+                <option value="30">30</option>
+                <option value="35">35</option>
+                <option value="40">40</option>
+                <option value="45">45</option>
+                <option value="50">50</option>
+                <option value="55">55</option>
+
+              </select>
+            </span>
+
+            <span>
+              <input type="hidden" value="" size="1" id="edit_form_expirationDate_1_ampm" name="expirationDate_ampm" originalvalue=""></span>
+          </div>
+        </div>
+        <div class="calendar"><table cellspacing="0" cellpadding="0" style="visibility: visible;"><thead><tr><td colspan="1" class="button"><div unselectable="on">?</div></td><td colspan="6" class="title" style="cursor: move;">August, 2013</td><td colspan="1" class="button"><div unselectable="on">×</div></td></tr><tr class="headrow"><td colspan="1" class="button nav"><div unselectable="on">«</div></td><td colspan="1" class="button nav"><div unselectable="on">‹</div></td><td colspan="4" class="button"><div unselectable="on">Today</div></td><td colspan="1" class="button nav"><div unselectable="on">›</div></td><td colspan="1" class="button nav"><div unselectable="on">»</div></td></tr><tr class="daynames"><td class="name wn">wk</td><td class="day name">Mon</td><td class="day name">Tue</td><td class="day name">Wed</td><td class="day name">Thu</td><td class="day name">Fri</td><td class="name day weekend">Sat</td><td class="name day weekend">Sun</td></tr></thead><tbody><tr class="daysrow"><td class="day wn">31</td><td class="emptycell">&nbsp;</td><td class="emptycell">&nbsp;</td><td class="emptycell">&nbsp;</td><td class="day">1</td><td class="day">2</td><td class="day weekend">3</td><td class="day weekend">4</td></tr><tr class="daysrow"><td class="day wn">32</td><td class="day">5</td><td class="day selected today">6</td><td class="day">7</td><td class="day">8</td><td class="day">9</td><td class="day weekend">10</td><td class="day weekend">11</td></tr><tr class="daysrow"><td class="day wn">33</td><td class="day">12</td><td class="day">13</td><td class="day">14</td><td class="day">15</td><td class="day">16</td><td class="day weekend">17</td><td class="day weekend">18</td></tr><tr class="daysrow"><td class="day wn">34</td><td class="day">19</td><td class="day">20</td><td class="day">21</td><td class="day">22</td><td class="day">23</td><td class="day weekend">24</td><td class="day weekend">25</td></tr><tr class="daysrow"><td class="day wn">35</td><td class="day">26</td><td class="day">27</td><td class="day">28</td><td class="day">29</td><td class="day">30</td><td class="day weekend">31</td><td class="emptycell">&nbsp;</td></tr><tr class="emptyrow"><td class="day wn">36</td><td class="emptycell">&nbsp;</td><td class="emptycell">&nbsp;</td><td class="emptycell">&nbsp;</td><td class="emptycell">&nbsp;</td><td class="emptycell">&nbsp;</td><td class="emptycell">&nbsp;</td><td class="emptycell">&nbsp;</td></tr></tbody><tfoot><tr class="footrow"><td colspan="8" class="ttip" style="cursor: move;">Select date</td></tr></tfoot></table><div class="combo"><div class="label">Jan</div><div class="label">Feb</div><div class="label">Mar</div><div class="label">Apr</div><div class="label">May</div><div class="label">Jun</div><div class="label">Jul</div><div class="label">Aug</div><div class="label">Sep</div><div class="label">Oct</div><div class="label">Nov</div><div class="label">Dec</div></div><div class="combo"><div class="label"></div><div class="label"></div><div class="label"></div><div class="label"></div><div class="label"></div><div class="label"></div><div class="label"></div><div class="label"></div><div class="label"></div><div class="label"></div><div class="label"></div><div class="label"></div></div></div>
+
+        <hr />
+
+        <h2>Categories</h2>
+        <div id="archetypes-fieldname-subject"
+          class="field ArchetypesKeywordWidget">
+          <span></span>
+          <label for="subject" class="formQuestion">
+            Categorie
+            <span id="subject_help" class="formHelp">
+              Le categorie, conosciute anche come parole chiave o etichette (tag), sono comunemente utilizzate per l'organizzazione dei contenuti
+            </span>
+          </label>
+
+          <div class="fieldErrorBox"></div>
+          <div id="subject-tags" class="tagsContainer">
+            <div class="existingTagsSection">
+
+              <dl class="existingTags">
+                <label for="subject">
+                  <dt id="existingTagsTitle">
+                    <span>Seleziona tra le categorie esistenti.</span>
+                  </dt>
+                  <span class="existingTagsHelp"></span>
+
+                </label>
+                <div class="visualClear">
+                  <!-- --> </div>
+                <div style="overflow-y: auto;" tabindex="9999" class="optionsBox" id="subject" name="subject_existing_keywords:list">
+                  <dd>
+                    <label for="subject-tags-0" class="checked hover">
+                      <input type="checkbox" checked="checked" id="subject-tags-0" value="test" name="subject_existing_keywords:list">test</label>
+                  </dd>
+                </div>
+                <a title="enable tag selector: tag selector is currently enabled" class="multiSelectA" href="javascript:;"></a>
+                <style type="text/css">.ArchetypesKeywordWidget label {display: block;}</style>
+
+                <span class="noTagsSelected">Nessuna categoria selezionata.</span>
+                <span class="oneOrMoreTagsSelected">% categorie selezionate</span>
+
+                <script type="text/javascript">(function($){$(document).ready( function() {$('#subject').multiSelect();});})(jQuery)</script>
+                <input type="hidden" name="subject_existing_keywords:default:list" value="" originalvalue=""></dl>
+              <dl class="selectedTagsSection">
+                <dt class="selectedTagsHeading">1 categorie selezionate</dt>
+                <dd class="selectedTags">
+                  <p class="selectedTag">
+                    <span class="selectedTag">test</span>
+                  </p>
+                </dd>
+              </dl>
+              <div class="visualClear">
+                <!-- --> </div>
+            </div>
+
+            <dl class="newTagsSection">
+              <label for="subject_keywords">
+                <dt class="newTagsTitle">
+                  <span>Crea ed aggiungi nuove categorie</span>
+                </dt>
+                <span class="newTagsHelp formHelp">
+                  Inserisci una categoria per linea, puoi inserire categorie di più parole su una linea.
+                </span>
+              </label>
+              <br>
+              <dd class="newTags">
+                <textarea rows="4" name="subject_keywords:lines" id="subject_keywords"></textarea>
+              </dd>
+            </dl>
+          </div>
+        </div>
+
+
+
+      <!-- end guide -->
+      </div>
+    </div>
+    @@include "../../snippets/extra_scripts.html"
+  </body>
+</html>

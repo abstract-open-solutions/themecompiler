@@ -1,14 +1,214 @@
-<rules
-    xmlns="http://namespaces.plone.org/diazo"
+<rules xmlns="http://namespaces.plone.org/diazo"
     xmlns:css="http://namespaces.plone.org/diazo/css"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xi="http://www.w3.org/2001/XInclude">
 
-<!--   <theme href="templates/base.html" />
-  <replace theme="/html/head/title" content="/html/head/title"/>
-  <append theme="/html/head" content="/html/head/link"/>
-  <append theme="/html/head" content="/html/head/script"/>
+  <rules css:if-content="#visual-portal-wrapper">
 
-  <replace css:theme="body" css:content="body" /> -->
+    <theme href="../templates/index.html" />
+
+    <!-- NB: drop development scripts -->
+    <drop css:theme="#development-scripts" />
+
+    <prepend theme='/html' content='/html/@lang'/>
+    <append  theme="/html/head" content="/html/head/base"/>
+    <append theme="/html/head" content="/html/head/script"/>
+    <replace theme="/html/head/title" content="/html/head/title"/>
+
+    <!-- Decomment this rule to enable standard Plone css
+
+    plone.less file contains some standard Plone styles
+    to avoid dependencies from Plone stylesheet files
+    -->
+    <!--
+     <append theme="/html/head" content="/html/head/link"/>
+    -->
+
+    <copy css:theme="body" attributes="class" css:content="body" />
+
+    <!-- Add custom rules there -->
+  </rules>
+
+
+
+  <!--
+    Twitter Bootstrap Integration
+    =============================
+
+    Decomment these rules to intergrate
+    Twitter Bootstrap markup in Plone
+
+    See: http://widerin.org/blog/turbo-twitter-bootstrap-theming-for-plone-using-diazo
+  -->
+
+  <!--
+  <xsl:template match="//ul//@class[contains(., 'selected')]">
+    <xsl:attribute name="class"><xsl:value-of select="."
+      /> active</xsl:attribute>
+  </xsl:template>
+
+  <xsl:template match="//ul//@class[contains(., 'contentViews')]">
+    <xsl:attribute name="class">nav nav-tabs</xsl:attribute>
+  </xsl:template>
+
+
+  <xsl:template match="//ul//@class[contains(., 'contentActions')]">
+    <xsl:attribute name="class">nav nav-tabs</xsl:attribute>
+  </xsl:template>
+
+  <xsl:template match="//ul[@id='contentActionMenus']//li">
+    <li>
+      <xsl:attribute name="class">dropdown pull-right</xsl:attribute>
+      <a>
+        <xsl:attribute name="class">dropdown-toggle</xsl:attribute>
+        <xsl:attribute name="data-toggle">dropdown</xsl:attribute>
+        <xsl:attribute name="href">
+          <xsl:value-of select="dl/dt/a/@href" />
+        </xsl:attribute>
+        <xsl:value-of select="substring-before(dl/dt/a, '▼')" />
+        <span class="caret"></span>
+      </a>
+      <ul>
+        <xsl:attribute name="class">dropdown-menu</xsl:attribute>
+        <xsl:for-each select="dl/dd/ul/li">
+          <xsl:if test="@class='actionSeparator'">
+            <li>
+              <xsl:attribute name="class">divider</xsl:attribute>
+            </li>
+          </xsl:if>
+
+          <xsl:copy-of select="." />
+        </xsl:for-each>
+      </ul>
+    </li>
+  </xsl:template>
+
+
+  <xsl:template match="//input[@type[contains(., 'submit') or contains(., 'button')]]">
+    <input>
+      <xsl:copy-of select="attribute::*[not(name()='class')]" />
+      <xsl:attribute name="class">
+        <xsl:value-of select="@class" />
+        btn
+        <xsl:if test="@name[contains(., 'delete') or contains(., 'Remove')]">btn-danger</xsl:if>
+        <xsl:if test="@name[contains(., 'save') or contains(., 'Save') or contains(., 'RenameAll') or contains(., 'FolderPublish')]">btn-primary</xsl:if>
+      </xsl:attribute>
+    </input>
+  </xsl:template>
+
+  <xsl:template match="//table[@class[contains(., 'listing')]]">
+    <table>
+      <xsl:copy-of select="attribute::*[not(name()='class')]" />
+      <xsl:attribute name="class">
+        table-striped table-bordered table-hover table
+        <xsl:value-of select="@class" />
+      </xsl:attribute>
+      <xsl:apply-templates />
+    </table>
+  </xsl:template>
+
+  <xsl:template match="//div[@class='listingBar']">
+    <div>
+      <xsl:copy-of select="attribute::*[not(name()='class')]" />
+      <xsl:attribute name="class">
+        <xsl:value-of select="@class" />
+        pagination
+      </xsl:attribute>
+      <ul>
+        <xsl:if test="span[@class='previous']/a">
+          <li>
+            <xsl:copy-of select="span[@class='previous']/a" />
+          </li>
+        </xsl:if>
+        <xsl:for-each select="*[not(contains(@class, 'previous')) and not(contains(@class, 'next'))]">
+          <xsl:choose>
+            <xsl:when test="child::a and not(child::text())">
+              <li>
+                <xsl:copy-of select="./a[text()]" />
+              </li>
+            </xsl:when>
+            <xsl:when test="child::a and child::text()">
+              <xsl:if test="position() = last()">
+                <li>
+                  <xsl:attribute name="class">disabled</xsl:attribute>
+                  <a>
+                    <xsl:attribute name="href">#</xsl:attribute>
+                    <xsl:copy-of select="text()" />
+                  </a>
+                </li>
+              </xsl:if>
+              <li>
+                <xsl:copy-of select="./a[text()]" />
+              </li>
+              <xsl:if test="position() = 1">
+                <li>
+                  <xsl:attribute name="class">disabled</xsl:attribute>
+                  <a>
+                    <xsl:attribute name="href">#</xsl:attribute>
+                    <xsl:copy-of select="text()" />
+                  </a>
+                </li>
+              </xsl:if>
+            </xsl:when>
+            <xsl:when test="name()='span' and not(child::a)">
+              <li>
+                <xsl:attribute name="class">active</xsl:attribute>
+                <a>
+                  <xsl:attribute name="href">#</xsl:attribute>
+                  <xsl:copy-of select="text()" />
+                </a>
+              </li>
+            </xsl:when>
+            <xsl:when test="@href">
+              <li>
+                <a>
+                  <xsl:attribute name="href">
+                    <xsl:value-of select="@href" />
+                  </xsl:attribute>
+                  <xsl:copy-of select="text()" />
+                </a>
+              </li>
+            </xsl:when>
+            <xsl:otherwise>
+              <li>
+                <xsl:attribute name="class">disabled</xsl:attribute>
+                <a>
+                  <xsl:attribute name="href">#</xsl:attribute>
+                  <xsl:copy-of select="text()" />
+                </a>
+              </li>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:for-each>
+        <xsl:if test="span[@class='next']/a">
+          <li>
+            <xsl:copy-of select="span[@class='next']/a" />
+          </li>
+        </xsl:if>
+      </ul>
+    </div>
+  </xsl:template>
+  -->
+
+  <!-- Twitter Bootstrap grid
+
+  Decomment these rules to replace standard Plone grid with Twitter Bootstrap grid system.
+
+  see: http://appuntiplone.wordpress.com/2013/07/26/convertire-il-grid-sunburst-in-bootstrap-via-diazo/
+
+  -->
+
+  <!--
+  <replace content="//div[contains(@class,'cell')]/@class">
+    <xsl:attribute name="class">
+      <xsl:if test='contains(current(),"width-3:4")'>col-lg-9</xsl:if>
+      <xsl:if test='contains(current(),"width-2:3")'>col-lg-8</xsl:if>
+      <xsl:if test='contains(current(),"width-1:2")'>col-lg-6</xsl:if>
+      <xsl:if test='contains(current(),"width-1:3")'>col-lg-4</xsl:if>
+      <xsl:if test='contains(current(),"width-1:4")'>col-lg-3</xsl:if>
+      <xsl:if test='contains(current(),"width-full")'>col-lg-12</xsl:if>
+    </xsl:attribute>
+  </replace>
+  -->
 
 </rules>

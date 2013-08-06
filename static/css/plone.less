@@ -1,0 +1,351 @@
+/*
+  This file contains basic css for Plone integration
+
+  These styles are copied from default Plone css in order
+  to make easier to develop a basic theme without depending
+  on Plone css.
+*/
+
+// Standard Plone style from tinyMCE style menu
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  text-align: left;
+  th, td {
+    padding: 0.5em 1em;
+    vertical-align: top;
+  }
+
+  &.invisible {
+    visibility: visible;
+  }
+
+  &.plain {
+    th {
+      text-align: left;
+    }
+    th, td {
+      border: 1px solid #DDDDDD;
+    }
+  }
+
+  &.listing {
+    tr.odd th {
+      border-color: #FFFFFF;
+      border-image: none;
+      border-style: solid solid none none;
+      border-width: 0.1em;
+    }
+    tbody th {
+      font-weight: bold;
+    }
+    th {
+      background: none repeat scroll 0 0 #DDDDDD;
+      border-color: #E7E7E7;
+      border-image: none;
+      border-style: solid solid none;
+      border-width: 0.1em;
+      color: #666666;
+      text-align: left;
+    }
+
+    tbody tr.odd td {
+      background: none repeat scroll 0 0 #EEEEEE;
+    }
+    tbody tr td {
+      background: none repeat scroll 0 0 transparent;
+    }
+    td {
+      border-right: 1px solid #DDDDDD;
+    }
+  }
+}
+
+
+
+ul {
+    list-style-image: none;
+  &.listTypeCircle {
+    list-style-type: circle;
+  }
+
+  &.listTypeDisc {
+    list-style-type: disc;
+  }
+
+  &.listTypeSquare {
+    list-style-type: square;
+  }
+
+}
+
+
+.visualHighlight {
+    background-color: #FFFFBB;
+}
+
+.discreet {
+    color: #666666;
+    font-size: 85%;
+    font-weight: normal;
+}
+
+.callout {
+    background: none repeat scroll 0 0 #EEEEEE;
+    border-left: 1em solid #CCCCCC;
+    clear: both;
+    padding: 1em;
+}
+
+.pullquote {
+    clear: right;
+    float: right;
+    font-size: 1.6em;
+    font-weight: bold;
+    letter-spacing: -0.08em !important;
+    line-height: 1.25em;
+    margin: 0 1em 0.5em 0.5em;
+    width: 35%;
+}
+
+
+
+.collapsible .collapse {
+  height: auto;
+}
+
+
+// Forms
+
+input[type="radio"], input[type="checkbox"] {
+    float: left;
+    margin-right: 0.5em !important;
+}
+
+.calendar {
+  display: none;
+}
+
+.plone_jscalendar {
+    select {
+        width: auto
+    }
+}
+
+.field {
+    clear: both;
+    margin-bottom: 1em;
+}
+
+li.formTab a.required span:after,
+div.field span.required:after,
+div.field .fieldRequired:after {
+    color: Red;
+    content: "■";
+    padding-left: 0.2em;
+}
+
+.optionsBox {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #999999;
+    height: 14em;
+    overflow-y: auto;
+    width: 100%;
+    dd {
+      margin-left: 0;
+    }
+    label {
+      &:hover,
+      &.checked {
+        background-color: #777777;
+        color: white;
+      }
+    }
+}
+
+.existingTags {
+    float: left;
+    width: 50%;
+}
+.selectedTagsSection {
+    float: left;
+    margin-bottom: 0;
+    margin-left: 3em;
+    width: 43%;
+}
+p.selectedTag {
+    margin-bottom: 0.4em;
+}
+
+a.link-category,
+span.selectedTag {
+    background: none repeat scroll 0 0 #DDDDDD;
+    border-radius: 0.5em 0.5em 0.5em 0.5em;
+    color: black;
+    padding: 0.25em 0.5em;
+}
+
+.newTagsSection {
+    width: 48%;
+}
+
+/* twitter Bootstrap fix */
+.field .label.formQuestion {
+    display: block;
+    background-color: transparent;
+    color: black;
+    font-size: 100%;
+    font-weight: normal;
+    line-height: normal;
+    padding: 2px 4px;
+    white-space: inherit;
+    text-shadow: none;
+}
+
+
+.field label {
+  font-weight: bold;
+}
+
+.formHelp {
+    color: #666666;
+    font-size: 85%;
+    font-weight: normal;
+}
+
+// form tabs
+ul.formTabs {
+  border: 0.3em solid #DDDDDD;
+  border-style: solid solid none;
+  border-top-left-radius: 0.5em;
+  border-top-right-radius: 0.5em;
+  display: block;
+  background-color: #DDDDDD;
+  margin-left: 0;
+  padding-left: 0;
+  li {
+    display: inline;
+    margin-right: 0.25em;
+    line-height: 1.5em;
+    margin-bottom: 0.25em;
+    a {
+      border: medium none;
+      line-height: 26px;
+      margin: 0;
+      padding: 0 0.75em;
+      text-decoration: none;
+      display: inline-block;
+      &:hover,
+      &.selected {
+        background: none repeat scroll 0 0 White;
+        border-top-left-radius: 0.5em;
+        border-top-right-radius: 0.5em;
+        color: Black;
+      }
+    }
+
+  }
+}
+
+
+// Popup - Overlay
+div.overlay {
+  display: none;
+  height: auto;
+  margin: 1em;
+  div.close {
+      background-image: url("../img/pb_close.png");
+      cursor: pointer;
+      height: 30px;
+      left: -14px;
+      position: absolute;
+      top: -14px;
+      width: 30px;
+      opacity: 1;
+      span {
+        display: block;
+        height: 1px;
+        margin: -1px 0 0 -1px;
+        overflow: hidden;
+        padding: 0;
+        width: 1px;
+      }
+  }
+}
+
+.pb-ajax,
+.pb-image {
+  background-color: #FFFFFF;
+  border: 1px solid #999999;
+  box-shadow: 0 0 3em 0.5em #666666;
+  white-space: normal;
+  > div {
+    padding: 1em;
+    width: 92%;
+  }
+}
+
+.pb-ajax {
+  overflow-y: auto;
+}
+
+
+// Portlets
+
+dl.portlet {
+  margin: 0 0 1em;
+  dt {
+    background: none repeat scroll 0 0 #DDDDDD;
+    line-height: normal;
+    padding: 0.42em 1em;
+    font-weight: bold;
+  }
+  dd.portletItem,
+  dd.portletFooter,
+  &.portletError dd {
+    padding: 1em;
+  }
+  li {
+    margin: 0;
+    padding: 0;
+    display: list-item;
+    line-height: 1.5em;
+    margin-bottom: 0.25em;
+    list-style: none outside none;
+  }
+}
+
+
+dl.portletNavigationTree {
+  dd.portletItem {
+    padding: 0;
+    margin: 0;
+  }
+  ul {
+    margin: 0;
+    padding: 0;
+    &.navTreeLevel0 > .navTreeItem {
+      border-bottom: 0.1em dotted #DDDDDD;
+      line-height: 2em;
+      padding: 0.25em 1em;
+    }
+    &.navTreeLevel1 .navTreeItem {
+      line-height: 2em;
+      padding-left: 0.5em;
+    }
+    &.navTree {
+      .navTreeCurrentItem {
+        background-color: #DDDDDD;
+        border-left: 1em solid #DDDDDD;
+        margin-left: -1em;
+        margin-right: -1em;
+      }
+
+      li a {
+        border: medium none;
+        display: block;
+      }
+    }
+  }
+
+}

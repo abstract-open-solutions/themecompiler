@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Editing</title>
+    @@include "../../snippets/head.html"
+  </head>
+  <body>
+    <div class="container" id="visual-portal-wrapper">
+      <div id="content">
+        <!-- start guide -->
+
+
+        <h1>Editing</h1>
+
+        <h2>Edit bar</h2>
+        <div class="documentEditable">
+          <div id="edit-bar">
+            <p class="hiddenStructure">Viste</p>
+            <ul id="content-views" class="nav nav-tabs">
+              <li class="selected active"
+                 id="contentview-folderContents">
+                <a href="#">Contenuti</a>
+              </li>
+              <li class="plain" id="contentview-view">
+                <a href="#">Visualizza</a>
+              </li>
+              <li class="plain" id="contentview-contentrules">
+                <a href="#">Regole</a>
+              </li>
+              <li class="plain" id="contentview-local_roles">
+                <a href="#">Condivisione</a>
+              </li>
+            </ul>
+            <div class="contentActions">
+              <ul id="contentActionMenus">
+                <li class="dropdown pull-right">
+                  <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                    Aggiungi…
+                    <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <a title="" id="folder" class="contenttype-folder" href="#">
+                        <span class="subMenuTitle">Cartella</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a title="Un collegamento a una risorsa interna o esterna." id="link" class="contenttype-link" href="#">
+                        <span class="subMenuTitle">Collegamento</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a title="Collezione di elementi ricercabili"
+                        id="collection"
+                        class="contenttype-collection" href="#">
+                        <span class="subMenuTitle">Collezione</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a title="Gli eventi possono essere visualizzati nel calendario." id="event" class="contenttype-event" href="#">
+                        <span class="subMenuTitle">Evento</span>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a title="Permette di caricare un file sul sito." id="file" class="contenttype-file" href="#">
+                        <span class="subMenuTitle">File</span>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a title="Le immagini possono essere inserite nelle pagine o visualizzate in un album." id="image" class="contenttype-image" href="#">
+                        <span class="subMenuTitle">Immagine</span>
+                      </a>
+                    </li>
+
+                    <li>
+                      <a title="Un annuncio che verrà visualizzato nell'elenco delle news." id="news-item" class="contenttype-news-item" href="#">
+                        <span class="subMenuTitle">Notizia</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a title="" id="document" class="contenttype-document" href="#">
+                        <span class="subMenuTitle">Pagina</span>
+                      </a>
+
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis tempus convallis nulla, a interdum risus euismod quis. Praesent laoreet dolor in sapien posuere, porta aliquam eros feugiat. Donec dui augue, cursus in purus in, placerat suscipit massa. Suspendisse eget ligula nulla.
+          </p><p>Mauris egestas, mi sit amet ullamcorper sollicitudin, nunc sem venenatis lectus, sed vulputate dolor libero vel elit. Fusce nec auctor eros. Praesent eleifend nibh quis lobortis tincidunt. Aliquam ac libero vel est semper accumsan. Integer sem orci, imperdiet vitae orci ac, vehicula posuere diam.</p>
+        </div>
+
+
+        <hr/>
+        <h2>Collapsible form</h2>
+        <form action="search" method="get"
+          name="search" id="searchform">
+          <div class="field collapsible">
+            <label for="created" class="collapser collapsed">New items since</label>
+            <div  style="display: none;" class="collapse">
+              <div class="formHelp">
+                Return items added since you were last logged on, the last week, etc.
+              </div>
+              <select name="created:list:date" id="created">
+                <option value="2010/09/06 17:50:45.971272 GMT-7">Last log-in</option>
+                <option value="2010/09/05">Yesterday</option>
+                <option value="2010/08/30">Last week</option>
+                <option value="2010/08/06">Last month</option>
+                <option value="1970/02/01" class="default_option" selected="selected">Ever</option>
+              </select>
+            </div>
+          </div>
+          <div class="field collapsible">
+            <label for="Creator" class="collapser collapsed">Author</label>
+            <div style="display: none;" class="collapse">
+              <div class="formHelp">Return items created by a particular person.</div>
+              <select name="Creator" id="Creator">
+                <option value="" class="default_option">Any Author</option>
+                <option value="admin">admin</option>
+              </select>
+            </div>
+          </div>
+          <div class="visualClear" id="clear-space-before-submit"></div>
+        </form>
+
+        <hr />
+        <h2>Form tabs</h2>
+        <form name="edit_form"
+          class="enableUnloadProtection enableAutoFocus enableFormTabbing enableUnlockProtection" id="document-base-edit">
+
+          <fieldset id="fieldset-default">
+            <legend id="fieldsetlegend-default">Default</legend>
+
+            <div class="field ArchetypesStringWidget "
+                 id="archetypes-fieldname-title">
+              <span></span>
+                <label class="formQuestion" for="title">
+                    Titolo
+                    <span class="required" title="Obbligatorio">&nbsp;</span>
+                    <span class="formHelp" id="title_help"></span>
+                </label>
+              <div class="fieldErrorBox"></div>
+              <input type="text" name="title"
+                class="blurrable firstToFocus" id="title"
+                value="Benvenuto in Plone" size="30"
+                maxlength="255" placeholder="" />
+            </div>
+          </fieldset>
+
+          <fieldset id="fieldset-date">
+            <legend id="fieldsetlegend-date">Date</legend>
+
+            <div class="field ArchetypesStringWidget "
+                 id="archetypes-fieldname-desc">
+              <span></span>
+                <label class="formQuestion" for="desc">
+                    Description
+                    <span class="required" title="Obbligatorio">&nbsp;</span>
+                    <span class="formHelp" id="desc_help"></span>
+                </label>
+              <div class="fieldErrorBox"></div>
+              <textarea name="desc">
+              </textarea>
+            </div>
+          </fieldset>
+
+        </form>
+
+
+
+
+      <!-- end guide -->
+      </div>
+    </div>
+    @@include "../../snippets/extra_scripts.html"
+  </body>
+</html>
+

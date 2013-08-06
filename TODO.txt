@@ -3,4 +3,3 @@ TODO
 
 * fix dumped_templates' links in theme.py in the page that lists the templates
 * complete README.txt in english
-*
