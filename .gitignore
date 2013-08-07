@@ -1,6 +1,7 @@
 # Ignore buildout dirs
 eggs
 bin
+!bin/theme.py
 develop-eggs
 parts
 Paste*
