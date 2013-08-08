@@ -1,0 +1,51 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          supervisor instance
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Debian startup script for a supervisor instance
+# Description:       This file should be used to construct scripts to be
+#                    placed in /etc/init.d.
+### END INIT INFO
+supervisorctl="/Users/giorgio/sviluppo/eprice/theme_test/themecompiler/bin/supervisorctl"
+supervisord="/Users/giorgio/sviluppo/eprice/theme_test/themecompiler/bin/supervisord"
+name="theme"
+[ -f $supervisord ] || exit 1
+[ -f $supervisorctl ] || exit 1
+RETVAL=0
+start() {
+echo -n "Starting $name: "
+start-stop-daemon --start --chuid theme --exec $supervisord
+RETVAL=$?
+[ $RETVAL -eq 0 ] && touch /var/run/$name
+echo
+return $RETVAL
+}
+stop() {
+echo -n "Stopping $name: "
+$supervisorctl shutdown
+RETVAL=$?
+[ $RETVAL -eq 0 ] && rm -f /var/run/$name
+echo
+return $RETVAL
+}
+status() {
+$supervisorctl status
+RETVAL=$?
+return $RETVAL
+}
+case "$1" in
+start)
+start
+;;
+stop)
+stop
+;;
+status)
+status
+;;
+*)
+echo "$0 [start|stop|status]"
+;;
+esac
+exit $REVAL

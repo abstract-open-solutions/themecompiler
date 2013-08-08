@@ -6,7 +6,483 @@
   on Plone css.
 */
 
-// Standard Plone style from tinyMCE style menu
+@import "contentsprites.less";
+
+#content {
+  .visualHighlight {
+      background-color: #FFFFBB;
+  }
+
+  .highlightedSearchTerm {
+     background-color: #ffa;
+  }
+  dl.searchResults .highlightedSearchTerm {
+      background-color: transparent;
+      font-weight: bold;
+  }
+
+  div.documentByLine {
+    font-size: 85%;
+    display: block;
+    color: #666;
+  }
+
+  img.tileImage,
+  div.newsImageContainer {
+    float: right;
+    margin: 0 1em 0.5em 1em;
+  }
+
+  .eventDetails .eventDetail {
+    clear: both;
+  }
+
+  .visualNoMarker {
+    list-style:none;
+    margin-left: 0;
+  }
+
+}
+
+.image-left {
+   float: left;
+   margin: 0.5em 1em 0.5em 0;
+}
+.image-right {
+   float: right;
+   margin: 0.5em;
+}
+.image-inline {
+   float: none;
+}
+
+.eventDetails {
+    float: right;
+    clear: right;
+    margin: 0 0 0.5em 1em;
+}
+
+dl.toc {
+    float: right;
+    width: 35%;
+    font-size: 100%;
+    margin: 1em 0 0.5em 1.5em;
+  dt {
+    margin-left: 1em;
+    font-weight: normal;
+    text-transform: uppercase;
+  }
+  dd {
+      margin-bottom: 0;
+      padding-left: 2em;
+    ol {
+      margin-left: 1.5em;
+    }
+  }
+
+}
+
+.collapsible .collapse {
+  height: auto;
+}
+
+#folderDefaultPageDisplay {
+  font-style: italic;
+  padding-left: 1.2em;
+  color: #5BC0DE;
+}
+
+.hiddenStructure {
+    display: none;
+    background: transparent;
+    background-image: none; /* safari bug */
+    border: none;
+    height: 0.1em;
+    overflow: hidden;
+    padding: 0;
+    margin: -0.1em 0 0 -0.1em;
+    width: 1px;
+}
+
+/* ensures hidden elements don't take up space */
+/* .ie6 is set on <html> by Modernizr library */
+.ie6 .hiddenStructure,
+.ie7 .hiddenStructure {
+    position: absolute;
+}
+
+.visualClear {
+  clear: both;
+}
+
+/* comments */
+.comment {
+  margin-top: 1.5em;
+  font-size: 80%;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: normal;
+  }
+
+}
+
+.comment .documentByLine {
+    margin-left: 1em;
+}
+
+.comment .formControls {
+    margin-left: 0;
+}
+
+.commentTime {
+    color: #666;
+}
+
+.commentBody {
+    padding: 1em;
+    margin: 0.5em 0;
+    border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    box-shadow: 0 0 1em 0 #888;
+    -moz-box-shadow: 0 0 0.5em 0 #888;
+    -webkit-box-shadow: 0 0 0.5em #888;
+}
+
+
+/* Sitemap */
+
+#portal-sitemap {
+  list-style: none;
+  margin-left: 0;
+  font-size: 130%;
+  font-weight: bold;
+  li {
+    list-style: none;
+    margin-left: 0;
+  }
+
+  a {
+    border-bottom: none;
+    display: block;
+  }
+
+  > li {
+    border-bottom:0.1em dotted #ddd;
+    line-height:1.8em;
+    padding:0.25em 1em;
+    margin-bottom: 0;
+  }
+
+  .navTreeLevel2,
+  .navTreeLevel2 ul {
+    font-size: 85%;
+    font-weight: normal;
+    margin-bottom: 0;
+    padding: 0.25em 0;
+  }
+}
+
+/* Album view classes */
+.photoAlbumEntry {
+  float: left;
+  position:relative;
+  overflow: hidden;
+  height: 185px;
+  width: 143px;
+  margin: 0em;
+  padding: 0px 6px 0px 9px;
+  text-align: center;
+  background-image: url('polaroid-single.png');
+  background-repeat: no-repeat;
+  img {
+    border: 1px solid #ccc;
+    display: block;
+    margin: 0 auto;
+  }
+  a {
+    display: block;
+    text-decoration: none;
+    font-size: 90%;
+    height: 169px;
+    width: 130px;
+    margin: 16px auto 0px;
+  }
+}
+.photoAlbumEntryWrapper {
+  /*display: block;*/
+  height: 130px;
+  width: 128px;
+  margin-bottom: 7px;
+}
+
+.photoAlbumFolder {
+  background-image: url('polaroid-multi.png');
+  background-repeat: no-repeat;
+}
+.photoAlbumEntryTitle {
+  color: #76797c;
+  display: block;
+  width: 128px;
+  height: 3.6em;
+}
+
+/* history */
+
+.reviewHistory,
+.contentHistory {
+    display: inline;
+    color: Black;
+}
+.spacer {
+    margin: 1em;
+}
+
+div.historyRecord {
+    margin-bottom: 1em;
+}
+
+
+div.historyTools{
+  ul {
+    float: right;
+    margin: 2px 1em;
+    li {
+      display: inline;
+      padding: 0 0.015em;
+      a {
+        border-bottom: none;
+      }
+    }
+  }
+  form {
+    display: inline;
+  }
+
+}
+
+.historyByLine {
+    background: #ddd;
+    padding: 0.5em;
+    border-top-right-radius: 0.5em;
+    border-top-left-radius: 0.5em;
+    -webkit-border-top-right-radius: 0.5em;
+    -webkit-border-top-left-radius: 0.5em;
+    -moz-border-radius-topleft: 0.5em;
+    -moz-border-radius-topright: 0.5em;
+}
+
+div.historyLinks {
+    float: right;
+    clear: right;
+    margin: 0.5em 1em 0 0;
+}
+
+
+div.historyComment {
+    padding: 0.5em 1em;
+    border: 1px solid #ddd;
+    p {
+      margin: 0;
+      padding-top: 1px;
+  }
+}
+
+
+a.historyComparePrevious {
+    border-top: 1px dotted #ccc;
+    display: block;
+    margin-top: 1.5em;
+    margin-bottom: -0.5em;
+    text-align: center;
+
+    span {
+        background-color: white;
+        position: relative;
+        top: -0.75em;
+        padding: 0 0.5em;
+    }
+
+}
+/* @end */
+
+
+/* Collapsible */
+dl.collapsible {
+    border: 0.1em solid #8cacbb;
+    margin: 1em 0;
+    padding: 0;
+    dt.collapsibleHeader {
+        display: block;
+        float: left;
+        background: White;
+        line-height: 1.2em;
+        vertical-align: middle;
+        font-size: 90%;
+        position: relative;
+        top: -0.6em;
+        width: auto;
+        margin: 0 0 -0.6em 1em;
+        padding: 0 0.5em;
+    }
+    dd.collapsibleContent {
+        margin: 0;
+        padding: 0 1em 0.4em;
+        clear: left;
+    }
+}
+
+/* for IE the following isn't needed, that's why the css2 selector is used */
+dl.collapsible dd.collapsibleContent > dl {
+    margin: 0;
+    padding: 0;
+}
+
+dl.expandedInlineCollapsible,
+dl.expandedBlockCollapsible {
+    dt.collapsibleHeader {
+        padding: 0 0.5em 0 2em;
+        background: White url(treeExpanded.png) no-repeat 0.5em 50%;
+        cursor: pointer;
+    }
+}
+
+dl.collapsedBlockCollapsible {
+    border: none;
+    height: 1em;
+    width: auto;
+}
+
+dl.collapsedInlineCollapsible,
+dl.collapsedBlockCollapsible {
+    dt.collapsibleHeader {
+        float: none;
+        position: relative;
+        margin: 0 0 0 1em;
+        padding: 0 0.5em 0 2em;
+        line-height: 1.2em;
+        cursor: pointer;
+        background: White url(treeCollapsed.png) no-repeat 0.5em 50%;
+    }
+    dd.collapsibleContent {
+       display: none;
+    }
+
+}
+
+dl.collapsedInlineCollapsible {
+    border: none;
+    height: 1em;
+    width: auto;
+    display: inline;
+    dt.collapsibleHeader {
+        position: static;
+        float: none;
+        margin: 0;
+        padding: 0 0 0 2em;
+        line-height: 1em;
+        cursor: pointer;
+        display: inline;
+    }
+
+}
+
+/* search results */
+#search-results-bar {
+  border-bottom: 1px solid #DDDDDD;
+  border-top: 1px solid #DDDDDD;
+  float: left;
+  padding: 1em 0;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+  > * {
+    float: left;
+  }
+  dl.actionMenu {
+    margin: 0 .5em;
+  }
+  dt.actionMenuHeader {
+    a {
+      border-bottom: medium none;
+      &:after {
+        content: " ▼";
+      }
+    }
+  }
+  dd.actionMenuContent {
+    margin-left: 0;
+    padding-left: 0;
+    margin-top: 1em;
+    padding: 0;
+    input[type="radio"], input[type="checkbox"] {
+      float: none;
+    }
+    div.field {
+      padding: 0 0.7em;
+    }
+  }
+}
+
+dl.actionMenu {
+  float: right;
+  margin-left: 0.5em;
+  position: relative;
+  white-space: nowrap;
+  &.deactivated dd {
+    display: none;
+  }
+  &.activated dd {
+    border-bottom-left-radius: 0.5em;
+    border-bottom-right-radius: 0.5em;
+    min-width: 100%;
+    position: absolute;
+    width: auto;
+    background-color: white;
+  }
+  a, div {
+    display: block !important;
+    white-space: nowrap;
+  }
+}
+
+#search-filter {
+  legend {
+    font-size: 100%;
+    font-weight: bold;
+    padding: 0 0.7em;
+    border-style: solid none;
+    border-width: 1px 0;
+    border-color: #E5E5E5;
+  }
+}
+
+input.searchPage {
+  display: inline-block;
+  float: left;
+  font-size: 200% !important;
+  &[type='text'] {
+    margin: 4px 0.3em;
+  }
+}
+
+
+fieldset#search-field {
+    border: medium none !important;
+    text-align: center;
+}
+#searchResultsSort {
+  float: right;
+}
+
+/*
+  Standard Plone style from tinyMCE style menu
+*/
+
 table {
   border-collapse: collapse;
   border-spacing: 0;
@@ -80,9 +556,6 @@ ul {
 }
 
 
-.visualHighlight {
-    background-color: #FFFFBB;
-}
 
 .discreet {
     color: #666666;
@@ -108,14 +581,11 @@ ul {
     width: 35%;
 }
 
-
-
-.collapsible .collapse {
-  height: auto;
-}
-
-
 // Forms
+
+.formcontrols input {
+  margin-right: .5em
+}
 
 input[type="radio"], input[type="checkbox"] {
     float: left;
@@ -251,8 +721,9 @@ ul.formTabs {
 // Popup - Overlay
 div.overlay {
   display: none;
-  height: auto;
   margin: 1em;
+  width: auto;
+  height: auto;
   div.close {
       background-image: url("../img/pb_close.png");
       cursor: pointer;
@@ -273,6 +744,13 @@ div.overlay {
   }
 }
 
+div.overlay-iframe,
+div.overlay-ajax {
+  width: 60%;
+  min-height: 100px;
+  z-index: 99;
+}
+
 .pb-ajax,
 .pb-image {
   background-color: #FFFFFF;
@@ -281,7 +759,7 @@ div.overlay {
   white-space: normal;
   > div {
     padding: 1em;
-    width: 92%;
+    width: 100%;
   }
 }
 
@@ -289,7 +767,18 @@ div.overlay {
   overflow-y: auto;
 }
 
-
+.spinner,
+#ajax-spinner {
+  background-position: center center;
+  display: none;
+  height: 20px;
+  left: 50%;
+  margin-left: -10px;
+  margin-top: -10px;
+  position: fixed;
+  top: 50%;
+  width: 20px;
+}
 // Portlets
 
 dl.portlet {

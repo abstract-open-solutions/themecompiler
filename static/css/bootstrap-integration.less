@@ -8,14 +8,10 @@ body {
   padding-top: 55px;
 }
 
-.hiddenStructure {
-  display: none;
+.documentByLine,
+.summary {
+  font-weight: normal;
 }
-
-.visualClear {
-  clear: both;
-}
-
 
 .formControls input,
 #folderlisting-main-table input {
@@ -42,4 +38,29 @@ body {
     margin-top: 70px;
     padding: 30px 0;
     text-align: center;
+}
+
+dd.actionMenuContent {
+    background-clip: padding-box;
+    background-color: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0px 0px 4px 4px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.176);
+    float: left;
+    left: 0;
+    list-style: none outside none;
+    margin: 2px 0 0;
+    min-width: 160px;
+    padding: 5px 0;
+    position: absolute;
+    top: 100%;
+    z-index: 1000;
+}
+
+.optionsToggle {
+  border-bottom: 1px solid #DDDDDD;
+  padding-bottom: 0.5em;
+  label {
+    font-weight: normal !important;
+  }
 }
