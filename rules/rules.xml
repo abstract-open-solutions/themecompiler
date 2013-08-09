@@ -5,7 +5,8 @@
 
   <rules css:if-content="#visual-portal-wrapper">
 
-    <theme href="../templates/index.html" />
+    <!-- Twitter bootstrap example template -->
+    <!-- <theme href="../templates/twitter_bootstrap.html" /> -->
 
     <!-- NB: drop development scripts -->
     <drop css:theme="#development-scripts" />
@@ -26,10 +27,16 @@
 
     <copy css:theme="body" attributes="class" css:content="body" />
 
-    <!-- Add custom rules there -->
+    <!-- Twitter Bootstrap template example rules -->
+    <!--
+      <xi:include href="++theme++themecompiler/rules/test_bootstrap.xml"/>
+    -->
+
+    <!-- *** Add custom rules there *** -->
+
   </rules>
 
-
+  <xi:include href="++theme++themecompiler/rules/experimental/forms.xml"/>
 
   <!--
     Twitter Bootstrap Integration
@@ -41,8 +48,8 @@
     See: http://widerin.org/blog/turbo-twitter-bootstrap-theming-for-plone-using-diazo
   -->
 
-<!--
 
+<!--
   <xsl:template match="//ul//@class[contains(., 'selected')]">
     <xsl:attribute name="class"><xsl:value-of select="."
       /> active</xsl:attribute>
@@ -208,6 +215,7 @@
 
 -->
 
+
   <!-- Twitter Bootstrap grid
 
   Decomment these rules to replace standard Plone grid with Twitter Bootstrap grid system.
@@ -216,7 +224,7 @@
 
   -->
 
-  <!--
+<!--
   <replace content="//div[contains(@class,'cell')]/@class">
     <xsl:attribute name="class">
       <xsl:if test='contains(current(),"width-3:4")'>
@@ -233,6 +241,6 @@
         <xsl:value-of select="."/> col-lg-12</xsl:if>
     </xsl:attribute>
   </replace>
-  -->
+ -->
 
 </rules>

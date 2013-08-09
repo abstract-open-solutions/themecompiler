@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules xmlns="http://namespaces.plone.org/diazo"
+  xmlns:css="http://namespaces.plone.org/diazo/css"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+  <replace css:content="form .field">
+    <div>
+      <xsl:copy-of select="@*" />
+      <xsl:attribute name="class">
+        <xsl:value-of select="@class"
+      /> form-group has-success</xsl:attribute>
+
+      <label>
+        <xsl:copy-of select="@*" />
+        <xsl:attribute name="class">
+          <xsl:value-of select="./label/@class"
+        /> control-label</xsl:attribute>
+        <xsl:apply-templates select="./label/text()"/>
+        <xsl:for-each select="./label/span">
+          <span>
+            <xsl:copy-of select="@*" />
+            <xsl:copy-of select="./*|./text()"/>
+          </span>
+        </xsl:for-each>
+
+<!--             <xsl:apply-templates match=".//@class[contains(., 'formHelp')]">
+          <xsl:attribute name="class"><xsl:value-of select="."
+            /> help-block</xsl:attribute>
+        </xsl:apply-templates> -->
+      </label>
+      <input class="form-control" />
+<!--       <label class="control-label" for="inputSuccess">Input with success</label>
+      <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+      <input type="text" class="form-control" id="inputSuccess" /> -->
+    </div>
+  </replace>
+
+  <replace css:content="input">
+    <xsl:choose>
+      <xsl:when css:test="[type='text']">
+        <input>
+          <xsl:copy-of select="@*" />
+          <xsl:attribute name="class"
+            ><xsl:value-of select="@class"
+              /> form-control</xsl:attribute>
+        </input>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy-of select="."/>
+      </xsl:otherwise>
+
+    </xsl:choose>
+  </replace>
+
+
+  <replace css:content="textarea">
+    <textarea>
+      <xsl:copy-of select="@*" />
+      <xsl:attribute name="class">
+        <xsl:value-of select="@class"/> form-control</xsl:attribute>
+    </textarea>
+  </replace>
+  <!-- Forms -->
+<!--   <replace css:content=".formHelp">
+      <div class="formHelp muted">
+          <xsl:apply-templates select="./*|./text()"/>
+      </div>
+  </replace>
+ -->
+
+
+<!--   <rules css:if-content="body.template-search">
+      <replace css:content=".actionMenu">
+          <div class="btn-group">
+              <button class="btn">
+                  <xsl:value-of select="./dt/a"/>
+              </button>
+              <button class="btn dropdown-toggle" data-toggle="dropdown">
+              <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu nav-list">
+                  <xsl:for-each select="./dd//fieldset">
+                      <li class="nav-header"><xsl:value-of select="./legend"/></li>
+                      <li class="divider"></li>
+                      <xsl:for-each select="./div//input[@type='checkbox']">
+                          <li>
+                              <label>
+                                  <xsl:attribute name="for">
+                                      <xsl:value-of select="following-sibling::label/@for"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="class">checkbox</xsl:attribute>
+                                  <xsl:copy-of select="."/>
+                                  <xsl:value-of select="following-sibling::label/text()"/>
+                              </label>
+                          </li>
+                      </xsl:for-each>
+                      <xsl:for-each select="./div//input[@type='radio']">
+                          <li>
+                              <label>
+                                  <xsl:attribute name="for">
+                                      <xsl:value-of select="following-sibling::label/@for"/>
+                                  </xsl:attribute>
+                                  <xsl:attribute name="class">radio</xsl:attribute>
+                                  <xsl:copy-of select="."/>
+                                  <xsl:value-of select="following-sibling::label/text()"/>
+                              </label>
+                          </li>
+                      </xsl:for-each>
+                  </xsl:for-each>
+                  <li class="divider"></li>
+                  <li>
+                      <button class="btn btn-primary">
+                          <xsl:value-of select=".//input[@type='submit']/@value"/>
+                      </button>
+                  </li>
+              </ul>
+          </div>
+      </replace>
+      <replace css:content="#searchResultsSort">
+          <div class="clearfix">
+              <xsl:copy-of select="."/>
+          </div>
+          <hr/>
+      </replace>
+  </rules> -->
+
+</rules>

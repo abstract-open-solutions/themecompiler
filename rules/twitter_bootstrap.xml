@@ -1,0 +1,55 @@
+<rules xmlns="http://namespaces.plone.org/diazo"
+    xmlns:css="http://namespaces.plone.org/diazo/css"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+    <copy css:theme="a#portal-logo"
+      attributes="href title accesskey"
+      css:content="#portal-logo" />
+
+    <copy css:theme="#portal-globalnav"
+      css:content-children="#portal-globalnav" />
+
+    <drop css:content="#portal-breadcrumbs"/>
+    <copy css:theme="#portal-breadcrumbs">
+      <xsl:copy-of css:select="#portal-breadcrumbs"/>
+    </copy>
+
+
+    <!-- portal-personaltools -->
+    <replace css:content="#anon-personalbar a"
+        css:theme="#portal-personaltools a.dropdown-toggle"
+        css:if-content="#anon-personalbar"
+      />
+
+    <rules css:if-not-content="#anon-personalbar">
+      <copy css:theme="#portal-personaltools .dropdown-menu"
+        css:content-children="#portal-personaltools dd ul" />
+      <replace
+        css:theme-children="#portal-personaltools a.dropdown-toggle"
+        css:content-children="#portal-personaltools .actionMenuHeader a#user-name" />
+      <before css:theme-children="#portal-personaltools a.dropdown-toggle"
+        method="raw">
+        <span class="glyphicon glyphicon-user"> </span>
+      </before>
+
+      <after css:theme-children="#portal-personaltools a.dropdown-toggle"
+        method="raw">
+        <span class="caret"></span>
+      </after>
+    </rules>
+
+    <replace
+      css:theme="#portal-column-content"
+      css:content="#portal-column-content" />
+
+    <replace
+      css:theme="#portal-column-one"
+      css:content="#portal-column-one" />
+
+    <replace
+      css:theme="#portal-column-two"
+      css:content="#portal-column-two" />
+
+</rules>
