@@ -12,9 +12,11 @@
     <drop css:theme="#development-scripts" />
 
     <prepend theme='/html' content='/html/@lang'/>
+    <prepend theme='/html/head' content='/html/head/meta'/>
+    <replace theme="/html/head/title" content="/html/head/title"/>
     <append  theme="/html/head" content="/html/head/base"/>
     <append theme="/html/head" content="/html/head/script"/>
-    <replace theme="/html/head/title" content="/html/head/title"/>
+
 
     <!-- Decomment this rule to enable standard Plone css
 
@@ -23,6 +25,7 @@
     -->
     <!--
      <append theme="/html/head" content="/html/head/link"/>
+     <prepend theme="/html/head" content="/html/head/style" />
     -->
 
     <copy css:theme="body" attributes="class" css:content="body" />
