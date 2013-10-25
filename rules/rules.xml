@@ -136,12 +136,8 @@
 
   <xsl:template match="//div[@class='listingBar']">
   <div>
-    <xsl:copy-of select="attribute::*[not(name()='class')]" />
-    <xsl:attribute name="class">
-      <xsl:value-of select="@class" />
-      pagination
-    </xsl:attribute>
-    <ul>
+    <xsl:copy-of select="attribute::*" />
+    <ul class="pagination">
       <xsl:if test="span[@class='previous']/a">
         <li>
           <xsl:copy-of select="span[@class='previous']/a" />
