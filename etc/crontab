@@ -1,3 +1,0 @@
-*/10 *  * * * theme cd /Users/giorgio/sviluppo/eprice/theme_test/themecompiler/portal_theme/ && svn up ../ && /Users/giorgio/sviluppo/eprice/theme_test/themecompiler/bin/py /Users/giorgio/sviluppo/eprice/theme_test/themecompiler/bin/theme.py compile --compile-less --nodejs-bin=/Users/giorgio/sviluppo/eprice/theme_test/themecompiler/parts/node-v0.6.15/bin/node
-*/10 *  * * * theme cd /Users/giorgio/sviluppo/eprice/theme_test/themecompiler/school_theme/ && svn up ../ && /Users/giorgio/sviluppo/eprice/theme_test/themecompiler/bin/py /Users/giorgio/sviluppo/eprice/theme_test/themecompiler/bin/theme.py compile --compile-less --nodejs-bin=/Users/giorgio/sviluppo/eprice/theme_test/themecompiler/parts/node-v0.6.15/bin/node
-# END
